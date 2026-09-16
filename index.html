@@ -13,15 +13,31 @@
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
-        /* Invoice Custom Styles */
+        /* Document Styles */
         .invoice-box {
             background: #fff;
-            padding: 30px;
-            border: 1px solid #eee;
+            padding: 0 35px 35px 35px;
             color: #000;
-            font-family: Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 15px;
         }
-        .invoice-title { letter-spacing: 2px; font-weight: bold; }
+
+        /* 1.6 Inch Letterhead Gap */
+        .letterhead-space {
+            height: 1.6in;
+            width: 100%;
+        }
+
+        .invoice-title { 
+            letter-spacing: 1.5px; 
+            font-weight: bold; 
+            text-align: center;
+            text-transform: uppercase;
+            text-decoration: underline;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
         .invoice-table th, .invoice-table td {
             border: 1px solid #000 !important;
             padding: 8px;
@@ -29,6 +45,10 @@
         }
 
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
             body * { visibility: hidden; }
             #printableInvoice, #printableInvoice * { visibility: visible; }
             #printableInvoice {
@@ -37,6 +57,7 @@
                 top: 0;
                 width: 100%;
                 border: none;
+                padding: 0 0.5in 0.5in 0.5in;
             }
             .no-print { display: none !important; }
         }
@@ -199,7 +220,7 @@
                             <label class="form-label fw-bold">মোবাইল নম্বর</label>
                             <input type="tel" id="qsCustPhone" class="form-control" placeholder="01776166548" required>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 fw-bold">বিক্রি নিশ্চিত করুন ও ইনভয়েস দেখুন</button>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">বিক্রি নিশ্চিত করুন ও প্রিন্ট দেখুন</button>
                     </form>
                 </div>
             </div>
@@ -249,66 +270,69 @@
         </div>
     </div>
 
-    <!-- Invoice Modal -->
+    <!-- Invoice / Delivery Chalan Modal -->
     <div class="modal fade" id="invoiceModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header no-print">
-                    <h5 class="modal-title">ইনভয়েস এডিট ও প্রিন্ট প্রিভিউ</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header no-print bg-light">
+                    <h5 class="modal-title">প্রিন্ট প্রিভিউ (A4 Size)</h5>
+                    <div class="d-flex gap-2 ms-auto">
+                        <button class="btn btn-primary btn-sm fw-bold px-3" onclick="switchDocType('invoice')">INVOICE</button>
+                        <button class="btn btn-info btn-sm fw-bold px-3 text-white" onclick="switchDocType('chalan')">DELIVERY CHALAN</button>
+                    </div>
+                    <button type="button" class="btn-close ms-2" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-0">
                     <div id="printableInvoice" class="invoice-box">
+                        
+                        <!-- 1.6 Inch Gap for Letterhead -->
+                        <div class="letterhead-space"></div>
+
                         <div class="text-center mb-4">
-                            <h2 class="invoice-title">INVOICE/BILL</h2>
+                            <h2 class="invoice-title" id="docMainTitle">INVOICE/BILL</h2>
+                        </div>
+
+                        <div class="row mb-2 fs-6">
+                            <div class="col-7">
+                                <p class="mb-1"><strong>To:</strong> <span contenteditable="true" id="invTo">Send</span></p>
+                            </div>
+                            <div class="col-5 text-end">
+                                <p class="mb-1"><strong id="invNumLabel">Invoice No:</strong> <span contenteditable="true" id="invNum">INV-1001</span></p>
+                            </div>
                         </div>
 
                         <div class="row mb-3 fs-6">
                             <div class="col-7">
-                                <p class="mb-1"><strong>Invoice No:</strong> <span contenteditable="true" id="invNum">INV-1001</span></p>
-                                <p class="mb-1"><strong>To:</strong> <span contenteditable="true" id="invTo">Send</span></p>
+                                <p class="mb-1"><strong>Subject:</strong> <span contenteditable="true" id="invSubject">Bill of IT Products</span></p>
                             </div>
                             <div class="col-5 text-end">
                                 <p class="mb-1"><strong>Date:</strong> <span contenteditable="true" id="invDate">16/09/2026</span></p>
                             </div>
                         </div>
 
-                        <div class="mb-3 fs-6">
-                            <p class="mb-1"><strong>Subject:</strong> <span contenteditable="true" id="invSubject">Bill of IT Products</span></p>
-                        </div>
+                        <!-- Table Area -->
+                        <div id="documentTableContainer"></div>
 
-                        <table class="table invoice-table mt-3">
-                            <thead>
-                                <tr>
-                                    <th style="width: 8%;">SL/No</th>
-                                    <th style="width: 52%;">Description</th>
-                                    <th style="width: 12%;">Quantity</th>
-                                    <th style="width: 13%;">Unit Price</th>
-                                    <th style="width: 15%;">Total Price</th>
-                                </tr>
-                            </thead>
-                            <tbody id="invoiceRows"></tbody>
-                        </table>
-
-                        <div class="no-print mb-2">
+                        <div class="no-print mb-2 mt-2">
                             <button class="btn btn-sm btn-outline-primary" onclick="addInvoiceRow()"><i class="fa-solid fa-plus me-1"></i>+ Add Row</button>
                         </div>
 
-                        <p class="mt-4 mb-5 fs-6">Thanking you and assuring you our best services at all times<br>Sincerely yours,</p>
+                        <p class="mt-4 mb-1 fs-6">Thanking you and assuring you our best Services at all times</p>
+                        <p class="mb-4 fs-6">Sincerely yours,</p>
 
-                        <div class="row mt-5 pt-3 fs-6">
-                            <div class="col-6">
+                        <div class="row fs-6">
+                            <div class="col-12">
                                 <p class="mb-1"><strong>Md. Nacher Uddin Reaz</strong></p>
-                                <p class="mb-1">Proprietor of <strong>Amin Computer</strong></p>
-                                <p class="mb-1">Cell: +880175911108</p>
-                                <p class="mb-0">E-mail: amintechnology16@gmail.com</p>
+                                <p class="mb-1">Proprietor of Amin Computer</p>
+                                <p class="mb-1">Cell+880175911108</p>
+                                <p class="mb-0">e-mail:amintechnology16@gmail.com</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer no-print">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print me-1"></i>Print Invoice</button>
+                    <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print me-1"></i>Print Document</button>
                 </div>
             </div>
         </div>
@@ -321,6 +345,8 @@
         let inventory = JSON.parse(localStorage.getItem('it_inventory')) || [];
         let salesList = JSON.parse(localStorage.getItem('it_sales')) || [];
         let cart = [];
+        let currentActiveSale = null;
+        let currentDocType = 'invoice';
 
         function renderDashboard() {
             const tbody = document.getElementById('inventoryTableBody');
@@ -381,7 +407,9 @@
             inventory[idx].qty -= qty;
 
             const saleRecord = {
-                date: new Date().toLocaleDateString(),
+                invId: "INV-" + Math.floor(1000 + Math.random() * 9000),
+                chalanId: "CHALLAN-" + Math.floor(1000 + Math.random() * 9000),
+                date: new Date().toLocaleDateString('en-GB'),
                 customer: custName,
                 phone: custPhone,
                 items: [{ name: inventory[idx].name, price: price, qty: qty }],
@@ -475,7 +503,9 @@
             });
 
             const saleRecord = {
-                date: new Date().toLocaleDateString(),
+                invId: "INV-" + Math.floor(1000 + Math.random() * 9000),
+                chalanId: "CHALLAN-" + Math.floor(1000 + Math.random() * 9000),
+                date: new Date().toLocaleDateString('en-GB'),
                 customer: custName,
                 phone: custPhone,
                 items: [...cart],
@@ -493,76 +523,147 @@
             updateCartUI();
         });
 
-        // INVOICE AUTO-CALCULATION SYSTEM (FIXED)
+        // INVOICE / CHALAN SYSTEM
         function generateInvoice(sale) {
-            document.getElementById('invNum').innerText = "INV-" + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('invTo').innerText = sale.customer + " (" + sale.phone + ")";
+            currentActiveSale = sale;
+            switchDocType('invoice');
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
+        }
+
+        function switchDocType(type) {
+            currentDocType = type;
+            if(!currentActiveSale) return;
+
+            const sale = currentActiveSale;
+            document.getElementById('invTo').innerText = sale.customer + (sale.phone ? " (" + sale.phone + ")" : "");
             document.getElementById('invDate').innerText = sale.date;
             document.getElementById('invSubject').innerText = "Bill of " + sale.items.map(i => i.name).join(", ");
 
-            const tbody = document.getElementById('invoiceRows');
-            tbody.innerHTML = '';
+            const container = document.getElementById('documentTableContainer');
 
-            sale.items.forEach((item, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = 'item-row';
-                tr.innerHTML = `
-                    <td>${String(idx + 1).padStart(2, '0')}.</td>
-                    <td contenteditable="true">${item.name}</td>
-                    <td contenteditable="true" class="qty-cell" oninput="recalculateInvoice()">${item.qty}</td>
-                    <td contenteditable="true" class="price-cell" oninput="recalculateInvoice()">${Number(item.price).toFixed(2)}</td>
-                    <td class="total-cell">0.00</td>
+            if (type === 'invoice') {
+                document.getElementById('docMainTitle').innerText = "INVOICE/BILL";
+                document.getElementById('invNumLabel').innerText = "Invoice No:";
+                document.getElementById('invNum').innerText = sale.invId || "INV-1001";
+
+                let rowsHtml = '';
+                sale.items.forEach((item, idx) => {
+                    const total = item.qty * item.price;
+                    rowsHtml += `
+                        <tr class="item-row">
+                            <td style="width: 8%;">${String(idx + 1).padStart(2, '0')}</td>
+                            <td style="width: 52%; text-align: left;" contenteditable="true">${item.name}</td>
+                            <td style="width: 12%;" contenteditable="true" class="qty-cell" oninput="recalculateInvoice()">${String(item.qty).padStart(2, '0')}pcs</td>
+                            <td style="width: 13%;" contenteditable="true" class="price-cell" oninput="recalculateInvoice()">${Number(item.price).toFixed(2)}</td>
+                            <td style="width: 15%;" class="total-cell">${Number(total).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                container.innerHTML = `
+                    <table class="table invoice-table mt-3">
+                        <thead>
+                            <tr>
+                                <th>SL/No</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceRows">
+                            ${rowsHtml}
+                            <tr id="grandTotalRow">
+                                <td colspan="4" class="text-end fw-bold">Total Price</td>
+                                <td id="invoiceGrandTotal" class="fw-bold">${Number(sale.totalAmount).toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 `;
-                tbody.appendChild(tr);
-            });
+            } else {
+                /* DELIVERY CHALAN FORMAT - (REMARK REMOVED COMPLETELY) */
+                document.getElementById('docMainTitle').innerText = "DELIVERY/CHALAN";
+                document.getElementById('invNumLabel').innerText = "CHALLAN No:";
+                document.getElementById('invNum').innerText = sale.chalanId || "CHALLAN-1001";
 
-            // Grand Total Row
-            const totalTr = document.createElement('tr');
-            totalTr.id = 'grandTotalRow';
-            totalTr.innerHTML = `
-                <td colspan="4" class="text-end fw-bold">Total Price</td>
-                <td id="invoiceGrandTotal" class="fw-bold">0.00</td>
-            `;
-            tbody.appendChild(totalTr);
+                let rowsHtml = '';
+                sale.items.forEach((item, idx) => {
+                    rowsHtml += `
+                        <tr class="item-row">
+                            <td style="width: 10%;">${String(idx + 1).padStart(2, '0')}</td>
+                            <td style="width: 70%; text-align: left;" contenteditable="true">${item.name}</td>
+                            <td style="width: 20%;" contenteditable="true">${String(item.qty).padStart(2, '0')}pcs</td>
+                        </tr>
+                    `;
+                });
 
-            recalculateInvoice();
-            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
+                container.innerHTML = `
+                    <table class="table invoice-table mt-3">
+                        <thead>
+                            <tr>
+                                <th>SL/No</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceRows">
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                `;
+            }
         }
 
         function addInvoiceRow() {
             const tbody = document.getElementById('invoiceRows');
+            if(!tbody) return;
+
             const totalRow = document.getElementById('grandTotalRow');
             const newIndex = tbody.querySelectorAll('.item-row').length + 1;
 
             const tr = document.createElement('tr');
             tr.className = 'item-row';
-            tr.innerHTML = `
-                <td>${String(newIndex).padStart(2, '0')}.</td>
-                <td contenteditable="true">New item details</td>
-                <td contenteditable="true" class="qty-cell" oninput="recalculateInvoice()">1</td>
-                <td contenteditable="true" class="price-cell" oninput="recalculateInvoice()">0.00</td>
-                <td class="total-cell">0.00</td>
-            `;
-            tbody.insertBefore(tr, totalRow);
-            recalculateInvoice();
+
+            if(currentDocType === 'invoice') {
+                tr.innerHTML = `
+                    <td>${String(newIndex).padStart(2, '0')}</td>
+                    <td contenteditable="true" style="text-align: left;">New item details</td>
+                    <td contenteditable="true" class="qty-cell" oninput="recalculateInvoice()">01pcs</td>
+                    <td contenteditable="true" class="price-cell" oninput="recalculateInvoice()">0.00</td>
+                    <td class="total-cell">0.00</td>
+                `;
+                if(totalRow) tbody.insertBefore(tr, totalRow);
+                else tbody.appendChild(tr);
+                recalculateInvoice();
+            } else {
+                tr.innerHTML = `
+                    <td>${String(newIndex).padStart(2, '0')}</td>
+                    <td contenteditable="true" style="text-align: left;">New item details</td>
+                    <td contenteditable="true">01pcs</td>
+                `;
+                tbody.appendChild(tr);
+            }
         }
 
         // Auto calculation engine
         function recalculateInvoice() {
+            if(currentDocType !== 'invoice') return;
             const rows = document.querySelectorAll('#invoiceRows .item-row');
             let grandTotal = 0;
 
             rows.forEach(row => {
-                const qtyText = row.querySelector('.qty-cell').innerText;
-                const priceText = row.querySelector('.price-cell').innerText;
+                const qtyEl = row.querySelector('.qty-cell');
+                const priceEl = row.querySelector('.price-cell');
+                const totalEl = row.querySelector('.total-cell');
 
-                // Extract pure numbers from input (handles text like '02pcs' or 'Tk')
-                const qty = parseFloat(qtyText.replace(/[^0-9.]/g, '')) || 0;
-                const price = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+                if(qtyEl && priceEl && totalEl) {
+                    const qty = parseFloat(qtyEl.innerText.replace(/[^0-9.]/g, '')) || 0;
+                    const price = parseFloat(priceEl.innerText.replace(/[^0-9.]/g, '')) || 0;
 
-                const lineTotal = qty * price;
-                row.querySelector('.total-cell').innerText = lineTotal.toFixed(2);
-                grandTotal += lineTotal;
+                    const lineTotal = qty * price;
+                    totalEl.innerText = lineTotal.toFixed(2);
+                    grandTotal += lineTotal;
+                }
             });
 
             const grandTotalEl = document.getElementById('invoiceGrandTotal');
@@ -612,9 +713,9 @@
 
         function seedITSampleData() {
             inventory = [
+                { sku: 'HIK-NVR32', name: 'Hikvision 32Channel NVR', buyPrice: 20000, salePrice: 23400, qty: 5, warranty: '1 Year' },
                 { sku: 'RAM-D4-8G', name: 'Corsair Vengeance 8GB DDR4 3200MHz', buyPrice: 2100, salePrice: 2600, qty: 10, warranty: '3 Years' },
-                { sku: 'SSD-512G', name: 'Kingston NV2 512GB PCIe 4.0 NVMe M.2', buyPrice: 3200, salePrice: 3800, qty: 10, warranty: '3 Years' },
-                { sku: 'HDD-1TB', name: 'WD Blue 1TB 3.5 Inch SATA Hard Drive', buyPrice: 4000, salePrice: 4800, qty: 6, warranty: '2 Years' }
+                { sku: 'SSD-512G', name: 'Kingston NV2 512GB PCIe 4.0 NVMe M.2', buyPrice: 3200, salePrice: 3800, qty: 10, warranty: '3 Years' }
             ];
             salesList = [];
             renderDashboard();
@@ -624,4 +725,4 @@
         else renderDashboard();
     </script>
 </body>
-                                                                         </html>
+</html>
