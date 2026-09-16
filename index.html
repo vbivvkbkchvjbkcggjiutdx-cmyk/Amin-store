@@ -3,25 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Store & Servicing Manager</title>
+    <title>IT Store, Servicing & POS System</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- HTML5 QR Code Scanner -->
-    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .stat-card { transition: transform 0.2s; }
-        .stat-card:hover { transform: translateY(-3px); }
-        .badge-low-stock { background-color: #ff4d4f; color: white; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        #reader { width: 100%; max-width: 500px; margin: 0 auto; border-radius: 8px; overflow: hidden; }
-        .nav-tabs .nav-link.active { font-weight: bold; border-bottom: 3px solid #0d6efd; color: #0d6efd; }
+        
+        /* Invoice Custom Styles */
+        .invoice-box {
+            background: #fff;
+            padding: 30px;
+            border: 1px solid #eee;
+            color: #000;
+            font-family: Arial, sans-serif;
+        }
+        .invoice-title { letter-spacing: 2px; font-weight: bold; }
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #000 !important;
+            padding: 8px;
+            text-align: center;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printableInvoice, #printableInvoice * { visibility: visible; }
+            #printableInvoice {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: none;
+            }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -29,8 +47,13 @@
     <!-- Navbar -->
     <nav class="navbar navbar-dark bg-dark mb-4 shadow">
         <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-microchip me-2"></i> IT Store & Servicing Manager</span>
-            <button class="btn btn-outline-light btn-sm" onclick="seedITSampleData()"><i class="fa-solid fa-database me-1"></i> ডেমো ডেটা রিসেট করুন</button>
+            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-microchip me-2"></i> IT Store, POS & ERP Manager</span>
+            <div>
+                <button class="btn btn-warning me-2" onclick="openCartModal()">
+                    <i class="fa-solid fa-cart-shopping me-1"></i> কার্ট (<span id="cartCount">0</span>)
+                </button>
+                <button class="btn btn-outline-light btn-sm" onclick="seedITSampleData()"><i class="fa-solid fa-database me-1"></i> ডেমো ডেটা</button>
+            </div>
         </div>
     </nav>
 
@@ -39,91 +62,34 @@
         <!-- Navigation Tabs -->
         <ul class="nav nav-tabs mb-4" id="mainTab" role="tablist">
             <li class="nav-item">
-                <button class="nav-link active" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory-sec" type="button"><i class="fa-solid fa-boxes-stacked me-2"></i>প্রোডাক্ট ইনভেন্টরি</button>
+                <button class="nav-link active" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory-sec" type="button"><i class="fa-solid fa-boxes-stacked me-2"></i>প্রোডাক্ট ইনভেন্টরি ও পস (POS)</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="servicing-tab" data-bs-toggle="tab" data-bs-target="#servicing-sec" type="button"><i class="fa-solid fa-wrench me-2"></i>সার্ভিসিং জব ড্যাশবোর্ড</button>
+                <button class="nav-link" id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts-sec" type="button"><i class="fa-solid fa-calculator me-2"></i>ডেইলি সেলস ও হিসাব</button>
             </li>
         </ul>
 
         <div class="tab-content" id="mainTabContent">
             
-            <!-- SECTION 1: INVENTORY MANAGEMENT -->
+            <!-- SECTION 1: INVENTORY & POS MANAGEMENT -->
             <div class="tab-pane fade show active" id="inventory-sec" role="tabpanel">
-                <!-- Top Stats -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <div class="card stat-card bg-primary text-white p-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-uppercase mb-1" style="font-size: 0.8rem;">মোট IT প্রোডাক্ট ক্যাটাগরি</h6>
-                                    <h2 class="mb-0 font-weight-bold" id="totalProducts">0</h2>
-                                </div>
-                                <i class="fa-solid fa-server fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stat-card bg-success text-white p-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-uppercase mb-1" style="font-size: 0.8rem;">মোট স্টক সংখ্যা</h6>
-                                    <h2 class="mb-0 font-weight-bold" id="totalStockCount">0</h2>
-                                </div>
-                                <i class="fa-solid fa-cubes fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stat-card bg-danger text-white p-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-uppercase mb-1" style="font-size: 0.8rem;">কম স্টক (Re-order Alert)</h6>
-                                    <h2 class="mb-0 font-weight-bold" id="lowStockCount">0</h2>
-                                </div>
-                                <i class="fa-solid fa-triangle-exclamation fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scanner & Analytics -->
-                <div class="row g-4 mb-4">
-                    <div class="col-lg-5">
-                        <div class="card h-100 p-3">
-                            <h5 class="card-title mb-3"><i class="fa-solid fa-qrcode text-primary me-2"></i>বারকোড / QR স্ক্যানার</h5>
-                            <div id="reader"></div>
-                            <div id="scanResult" class="alert alert-info mt-3 d-none text-center"></div>
-                        </div>
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="card h-100 p-3">
-                            <h5 class="card-title mb-3"><i class="fa-solid fa-chart-bar text-primary me-2"></i>ক্যাটাগরি অনুযায়ী স্টক এনালাইটিক্স</h5>
-                            <div style="position: relative; height:260px;">
-                                <canvas id="inventoryChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Table -->
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0"><i class="fa-solid fa-list-check text-primary me-2"></i>IT প্রোডাক্ট স্টক লিস্ট</h5>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                            <i class="fa-solid fa-plus me-1"></i> নতুন IT প্রোডাক্ট ইনপুট দিন
-                        </button>
+                        <h5 class="mb-0"><i class="fa-solid fa-list-check text-primary me-2"></i>প্রোডাক্ট স্টক ও সেলস</h5>
+                        <div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                                <i class="fa-solid fa-plus me-1"></i> নতুন পণ্য
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-dark">
                                 <tr>
                                     <th>SKU / কোড</th>
-                                    <th>পণ্যের নাম ও মডেল</th>
-                                    <th>ক্যাটাগরি</th>
-                                    <th>বর্তমান স্টক</th>
-                                    <th>সর্বনিম্ন সীমা</th>
-                                    <th>অবস্থা</th>
+                                    <th>পণ্যের নাম ও ব্র্যান্ড</th>
+                                    <th>ক্রয় / বিক্রয় মূল্য</th>
+                                    <th>স্টক</th>
                                     <th>অ্যাকশন</th>
                                 </tr>
                             </thead>
@@ -133,31 +99,21 @@
                 </div>
             </div>
 
-            <!-- SECTION 2: SERVICING MANAGEMENT -->
-            <div class="tab-pane fade" id="servicing-sec" role="tabpanel">
-                <div class="card p-4 mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0"><i class="fa-solid fa-laptop-medical text-primary me-2"></i>PC ও ফটোকপি মেসিন সার্ভিসিং বুকিং</h5>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addServiceModal">
-                            <i class="fa-solid fa-plus me-1"></i> নতুন সার্ভিসিং জব এন্ট্রি
-                        </button>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle">
-                            <thead class="table-secondary">
-                                <tr>
-                                    <th>জব আইডি</th>
-                                    <th>কাস্টমার ও মোবাইল</th>
-                                    <th>ডিভাইস ও মডেল</th>
-                                    <th>সমস্যা/ত্রুটি</th>
-                                    <th>বিল (Tk)</th>
-                                    <th>স্ট্যাটাস</th>
-                                    <th>অ্যাকশন</th>
-                                </tr>
-                            </thead>
-                            <tbody id="servicingTableBody"></tbody>
-                        </table>
-                    </div>
+            <!-- SECTION 2: DAILY ACCOUNTS & SALES -->
+            <div class="tab-pane fade" id="accounts-sec" role="tabpanel">
+                <div class="card p-4">
+                    <h5><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i>দৈনিক প্রোডাক্ট বিক্রির রিপোর্ট</h5>
+                    <table class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                                <th>তারিখ</th>
+                                <th>কাস্টমার</th>
+                                <th>আইটেম বিবরণ</th>
+                                <th>মোট বিল (Tk)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsTableBody"></tbody>
+                    </table>
                 </div>
             </div>
 
@@ -168,84 +124,191 @@
     <div class="modal fade" id="addProductModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">নতুন IT পণ্য ইনপুট দিন</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="productForm">
                         <div class="mb-3">
-                            <label class="form-label">SKU / বারকোড ID</label>
-                            <input type="text" id="pSku" class="form-control" placeholder="যেমন: RAM-D4-8G" required>
+                            <label class="form-label fw-bold">SKU / বারকোড ID</label>
+                            <input type="text" id="pSku" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">পণ্যের নাম ও মডেল</label>
-                            <input type="text" id="pName" class="form-control" placeholder="যেমন: Corsair Vengeance 8GB DDR4 3200MHz" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">ক্যাটাগরি</label>
-                            <select id="pCategory" class="form-select" required>
-                                <option value="RAM">RAM</option>
-                                <option value="SSD / NVMe">SSD / NVMe</option>
-                                <option value="Hard Disk">Hard Disk</option>
-                                <option value="Power Supply">Power Supply</option>
-                                <option value="Motherboard">Motherboard</option>
-                                <option value="CC Camera">CC Camera</option>
-                                <option value="Toner">Toner</option>
-                                <option value="Router">Router</option>
-                                <option value="Network Switch">Network Switch (8/16/32 Port)</option>
-                                <option value="Others">Others</option>
-                            </select>
+                            <label class="form-label fw-bold">পণ্যের নাম ও মডেল</label>
+                            <input type="text" id="pName" class="form-control" required>
                         </div>
                         <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="form-label">বর্তমান পরিমাণ</label>
-                                <input type="number" id="pQty" class="form-control" min="0" required>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">ক্রয় মূল্য (৳)</label>
+                                <input type="number" id="pBuyPrice" class="form-control" required>
                             </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label">সর্বনিম্ন সীমা</label>
-                                <input type="number" id="pMin" class="form-control" min="1" required>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">বিক্রয় মূল্য (৳)</label>
+                                <input type="number" id="pSalePrice" class="form-control" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">সংরক্ষণ করুন</button>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">পরিমাণ (Qty)</label>
+                                <input type="number" id="pQty" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">ওয়ারেন্টি</label>
+                                <input type="text" id="pWarranty" class="form-control" value="1 Year">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold mt-2">সংরক্ষণ করুন</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Add Service Job -->
-    <div class="modal fade" id="addServiceModal" tabindex="-1">
+    <!-- Modal: Single Product Quick Sell -->
+    <div class="modal fade" id="quickSellModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">নতুন সার্ভিসিং সার্ভিস বুকিং</h5>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">পণ্য বিক্রি করুন</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="quickSellForm">
+                        <input type="hidden" id="qsIndex">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">পণ্যের নাম</label>
+                            <input type="text" id="qsName" class="form-control" readonly>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">বিক্রয় মূল্য (৳)</label>
+                                <input type="number" id="qsPrice" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">বিক্রির পরিমাণ</label>
+                                <input type="number" id="qsQty" class="form-control" value="1" min="1" required>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">কাস্টমারের নাম</label>
+                            <input type="text" id="qsCustName" class="form-control" placeholder="যেমন: Send" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">মোবাইল নম্বর</label>
+                            <input type="tel" id="qsCustPhone" class="form-control" placeholder="01776166548" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">বিক্রি নিশ্চিত করুন ও ইনভয়েস দেখুন</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Cart & Multi Sell -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-cart-shopping me-2"></i>একসাথে একাধিক প্রোডাক্ট সেল</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="serviceForm">
-                        <div class="mb-3">
-                            <label class="form-label">কাস্টমারের নাম</label>
-                            <input type="text" id="sCustomer" class="form-control" placeholder="যেমন: আব্দুর রহমান" required>
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>প্রোডাক্টের নাম</th>
+                                <th>দাম</th>
+                                <th style="width: 100px;">পরিমাণ</th>
+                                <th>মোট</th>
+                                <th>মুছুন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartTableBody"></tbody>
+                    </table>
+                    <div class="text-end fw-bold fs-5 mb-3">
+                        সর্বমোট বিল: ৳ <span id="cartGrandTotal">0</span>
+                    </div>
+                    <hr>
+                    <form id="multiSellForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">কাস্টমারের নাম</label>
+                                <input type="text" id="mCustName" class="form-control" placeholder="যেমন: Send" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">মোবাইল নম্বর</label>
+                                <input type="tel" id="mCustPhone" class="form-control" placeholder="01776166548" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">মোবাইল নম্বর</label>
-                            <input type="tel" id="sPhone" class="form-control" placeholder="017xxxxxxxx" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">ডিভাইসের ধরন ও মডেল</label>
-                            <input type="text" id="sDevice" class="form-control" placeholder="যেমন: Desktop PC / Canon IR2006 Photocopy" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">সমস্যার বিবরণ</label>
-                            <textarea id="sProblem" class="form-control" rows="2" placeholder="যেমন: নো ডিসপ্লে / পেপার জাম সমস্যা" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">আনুমানিক/অনুমোদিত বিল (Tk)</label>
-                            <input type="number" id="sBill" class="form-control" placeholder="0" min="0">
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">সার্ভিস এন্ট্রি নিন</button>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">সব বিক্রি নিশ্চিত করুন ও ইনভয়েস তৈরি করুন</button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header no-print">
+                    <h5 class="modal-title">ইনভয়েস এডিট ও প্রিন্ট প্রিভিউ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="printableInvoice" class="invoice-box">
+                        <div class="text-center mb-4">
+                            <h2 class="invoice-title">INVOICE/BILL</h2>
+                        </div>
+
+                        <div class="row mb-3 fs-6">
+                            <div class="col-7">
+                                <p class="mb-1"><strong>Invoice No:</strong> <span contenteditable="true" id="invNum">INV-1001</span></p>
+                                <p class="mb-1"><strong>To:</strong> <span contenteditable="true" id="invTo">Send</span></p>
+                            </div>
+                            <div class="col-5 text-end">
+                                <p class="mb-1"><strong>Date:</strong> <span contenteditable="true" id="invDate">16/09/2026</span></p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 fs-6">
+                            <p class="mb-1"><strong>Subject:</strong> <span contenteditable="true" id="invSubject">Bill of IT Products</span></p>
+                        </div>
+
+                        <table class="table invoice-table mt-3">
+                            <thead>
+                                <tr>
+                                    <th style="width: 8%;">SL/No</th>
+                                    <th style="width: 52%;">Description</th>
+                                    <th style="width: 12%;">Quantity</th>
+                                    <th style="width: 13%;">Unit Price</th>
+                                    <th style="width: 15%;">Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceRows"></tbody>
+                        </table>
+
+                        <div class="no-print mb-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="addInvoiceRow()"><i class="fa-solid fa-plus me-1"></i>+ Add Row</button>
+                        </div>
+
+                        <p class="mt-4 mb-5 fs-6">Thanking you and assuring you our best services at all times<br>Sincerely yours,</p>
+
+                        <div class="row mt-5 pt-3 fs-6">
+                            <div class="col-6">
+                                <p class="mb-1"><strong>Md. Nacher Uddin Reaz</strong></p>
+                                <p class="mb-1">Proprietor of <strong>Amin Computer</strong></p>
+                                <p class="mb-1">Cell: +880175911108</p>
+                                <p class="mb-0">E-mail: amintechnology16@gmail.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer no-print">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print me-1"></i>Print Invoice</button>
                 </div>
             </div>
         </div>
@@ -256,223 +319,309 @@
 
     <script>
         let inventory = JSON.parse(localStorage.getItem('it_inventory')) || [];
-        let servicingJobs = JSON.parse(localStorage.getItem('it_servicing')) || [];
-        let chartInstance = null;
+        let salesList = JSON.parse(localStorage.getItem('it_sales')) || [];
+        let cart = [];
 
-        // Render Inventory Dashboard
         function renderDashboard() {
             const tbody = document.getElementById('inventoryTableBody');
             tbody.innerHTML = '';
-            
-            let totalQty = 0;
-            let lowStockCount = 0;
-
-            const categoryCounts = {};
 
             inventory.forEach((item, index) => {
-                totalQty += Number(item.qty);
-                const isLow = Number(item.qty) <= Number(item.minQty);
-                if (isLow) lowStockCount++;
-
-                categoryCounts[item.category] = (categoryCounts[item.category] || 0) + Number(item.qty);
+                const buy = Number(item.buyPrice) || 0;
+                const sale = Number(item.salePrice) || 0;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><code>${item.sku}</code></td>
                     <td><strong>${item.name}</strong></td>
-                    <td><span class="badge bg-secondary">${item.category}</span></td>
-                    <td><h6 class="mb-0">${item.qty}</h6></td>
-                    <td>${item.minQty}</td>
                     <td>
-                        ${isLow 
-                            ? '<span class="badge badge-low-stock"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock</span>' 
-                            : '<span class="badge bg-success">In Stock</span>'}
+                        <small class="text-muted">ক্রয়: ৳${buy}</small><br>
+                        <strong class="text-success">বিক্রয়: ৳${sale}</strong>
                     </td>
+                    <td><h6 class="mb-0 fw-bold">${item.qty}</h6></td>
                     <td>
-                        <button class="btn btn-sm btn-outline-success me-1" onclick="updateStock(${index}, 1)"><i class="fa-solid fa-plus"></i></button>
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="updateStock(${index}, -1)"><i class="fa-solid fa-minus"></i></button>
+                        <button class="btn btn-sm btn-success me-1" onclick="openQuickSell(${index})" ${item.qty <= 0 ? 'disabled' : ''}>
+                            <i class="fa-solid fa-cart-shopping me-1"></i>বিক্রি
+                        </button>
+                        <button class="btn btn-sm btn-warning me-1" onclick="addToCart(${index})" ${item.qty <= 0 ? 'disabled' : ''}>
+                            + কার্ট
+                        </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(${index})"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('totalProducts').innerText = inventory.length;
-            document.getElementById('totalStockCount').innerText = totalQty;
-            document.getElementById('lowStockCount').innerText = lowStockCount;
-
             localStorage.setItem('it_inventory', JSON.stringify(inventory));
-            renderChart(Object.keys(categoryCounts), Object.values(categoryCounts));
+            renderAccounts();
         }
 
-        function renderChart(labels, data) {
-            const ctx = document.getElementById('inventoryChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
+        function openQuickSell(index) {
+            const item = inventory[index];
+            document.getElementById('qsIndex').value = index;
+            document.getElementById('qsName').value = item.name;
+            document.getElementById('qsPrice').value = item.salePrice;
+            document.getElementById('qsQty').value = 1;
+            new bootstrap.Modal(document.getElementById('quickSellModal')).show();
+        }
 
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'বর্তমান স্টক (ইউনিট)',
-                        data: data,
-                        backgroundColor: 'rgba(13, 110, 253, 0.7)',
-                        borderColor: 'rgba(13, 110, 253, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
-                }
+        document.getElementById('quickSellForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const idx = document.getElementById('qsIndex').value;
+            const price = Number(document.getElementById('qsPrice').value) || 0;
+            const qty = Number(document.getElementById('qsQty').value) || 1;
+            const custName = document.getElementById('qsCustName').value.trim();
+            const custPhone = document.getElementById('qsCustPhone').value.trim();
+
+            if(inventory[idx].qty < qty) {
+                alert('স্টকে পর্যাপ্ত পণ্য নেই!');
+                return;
+            }
+
+            inventory[idx].qty -= qty;
+
+            const saleRecord = {
+                date: new Date().toLocaleDateString(),
+                customer: custName,
+                phone: custPhone,
+                items: [{ name: inventory[idx].name, price: price, qty: qty }],
+                totalAmount: price * qty
+            };
+
+            salesList.push(saleRecord);
+            localStorage.setItem('it_sales', JSON.stringify(salesList));
+
+            renderDashboard();
+            bootstrap.Modal.getInstance(document.getElementById('quickSellModal')).hide();
+            generateInvoice(saleRecord);
+        });
+
+        function addToCart(index) {
+            const item = inventory[index];
+            const existing = cart.find(c => c.inventoryIndex === index);
+            if (existing) {
+                if(existing.qty < item.qty) existing.qty += 1;
+                else alert('স্টকের চেয়ে বেশি যোগ করা সম্ভব নয়!');
+            } else {
+                cart.push({
+                    inventoryIndex: index,
+                    name: item.name,
+                    price: Number(item.salePrice) || 0,
+                    qty: 1
+                });
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.reduce((acc, c) => acc + c.qty, 0);
+            const tbody = document.getElementById('cartTableBody');
+            tbody.innerHTML = '';
+            let grandTotal = 0;
+
+            cart.forEach((cItem, i) => {
+                const total = cItem.price * cItem.qty;
+                grandTotal += total;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${cItem.name}</td>
+                    <td>৳ ${cItem.price}</td>
+                    <td><input type="number" class="form-control form-control-sm" value="${cItem.qty}" min="1" onchange="updateCartQty(${i}, this.value)"></td>
+                    <td>৳ ${total}</td>
+                    <td><button class="btn btn-sm btn-danger py-0" onclick="removeFromCart(${i})">X</button></td>
+                `;
+                tbody.appendChild(tr);
             });
+
+            document.getElementById('cartGrandTotal').innerText = grandTotal;
         }
 
-        // Add Product Submit
+        function updateCartQty(index, qty) {
+            const num = Number(qty);
+            const max = inventory[cart[index].inventoryIndex].qty;
+            if(num > max) {
+                alert('স্টকে পর্যাপ্ত পণ্য নেই!');
+                cart[index].qty = max;
+            } else if (num > 0) {
+                cart[index].qty = num;
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function openCartModal() {
+            if(cart.length === 0) {
+                alert('আপনার কার্ট খালি!');
+                return;
+            }
+            updateCartUI();
+            new bootstrap.Modal(document.getElementById('cartModal')).show();
+        }
+
+        document.getElementById('multiSellForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const custName = document.getElementById('mCustName').value.trim();
+            const custPhone = document.getElementById('mCustPhone').value.trim();
+
+            if (cart.length === 0) return;
+
+            cart.forEach(c => {
+                inventory[c.inventoryIndex].qty -= c.qty;
+            });
+
+            const saleRecord = {
+                date: new Date().toLocaleDateString(),
+                customer: custName,
+                phone: custPhone,
+                items: [...cart],
+                totalAmount: cart.reduce((acc, c) => acc + (c.price * c.qty), 0)
+            };
+
+            salesList.push(saleRecord);
+            localStorage.setItem('it_sales', JSON.stringify(salesList));
+
+            renderDashboard();
+            bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
+            
+            generateInvoice(saleRecord);
+            cart = [];
+            updateCartUI();
+        });
+
+        // INVOICE AUTO-CALCULATION SYSTEM (FIXED)
+        function generateInvoice(sale) {
+            document.getElementById('invNum').innerText = "INV-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('invTo').innerText = sale.customer + " (" + sale.phone + ")";
+            document.getElementById('invDate').innerText = sale.date;
+            document.getElementById('invSubject').innerText = "Bill of " + sale.items.map(i => i.name).join(", ");
+
+            const tbody = document.getElementById('invoiceRows');
+            tbody.innerHTML = '';
+
+            sale.items.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'item-row';
+                tr.innerHTML = `
+                    <td>${String(idx + 1).padStart(2, '0')}.</td>
+                    <td contenteditable="true">${item.name}</td>
+                    <td contenteditable="true" class="qty-cell" oninput="recalculateInvoice()">${item.qty}</td>
+                    <td contenteditable="true" class="price-cell" oninput="recalculateInvoice()">${Number(item.price).toFixed(2)}</td>
+                    <td class="total-cell">0.00</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Grand Total Row
+            const totalTr = document.createElement('tr');
+            totalTr.id = 'grandTotalRow';
+            totalTr.innerHTML = `
+                <td colspan="4" class="text-end fw-bold">Total Price</td>
+                <td id="invoiceGrandTotal" class="fw-bold">0.00</td>
+            `;
+            tbody.appendChild(totalTr);
+
+            recalculateInvoice();
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
+        }
+
+        function addInvoiceRow() {
+            const tbody = document.getElementById('invoiceRows');
+            const totalRow = document.getElementById('grandTotalRow');
+            const newIndex = tbody.querySelectorAll('.item-row').length + 1;
+
+            const tr = document.createElement('tr');
+            tr.className = 'item-row';
+            tr.innerHTML = `
+                <td>${String(newIndex).padStart(2, '0')}.</td>
+                <td contenteditable="true">New item details</td>
+                <td contenteditable="true" class="qty-cell" oninput="recalculateInvoice()">1</td>
+                <td contenteditable="true" class="price-cell" oninput="recalculateInvoice()">0.00</td>
+                <td class="total-cell">0.00</td>
+            `;
+            tbody.insertBefore(tr, totalRow);
+            recalculateInvoice();
+        }
+
+        // Auto calculation engine
+        function recalculateInvoice() {
+            const rows = document.querySelectorAll('#invoiceRows .item-row');
+            let grandTotal = 0;
+
+            rows.forEach(row => {
+                const qtyText = row.querySelector('.qty-cell').innerText;
+                const priceText = row.querySelector('.price-cell').innerText;
+
+                // Extract pure numbers from input (handles text like '02pcs' or 'Tk')
+                const qty = parseFloat(qtyText.replace(/[^0-9.]/g, '')) || 0;
+                const price = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+
+                const lineTotal = qty * price;
+                row.querySelector('.total-cell').innerText = lineTotal.toFixed(2);
+                grandTotal += lineTotal;
+            });
+
+            const grandTotalEl = document.getElementById('invoiceGrandTotal');
+            if (grandTotalEl) {
+                grandTotalEl.innerText = grandTotal.toFixed(2);
+            }
+        }
+
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const sku = document.getElementById('pSku').value.trim();
             const name = document.getElementById('pName').value.trim();
-            const category = document.getElementById('pCategory').value;
-            const qty = Number(document.getElementById('pQty').value);
-            const minQty = Number(document.getElementById('pMin').value);
+            const buyPrice = Number(document.getElementById('pBuyPrice').value) || 0;
+            const salePrice = Number(document.getElementById('pSalePrice').value) || 0;
+            const qty = Number(document.getElementById('pQty').value) || 0;
+            const warranty = document.getElementById('pWarranty').value.trim();
 
-            inventory.push({ sku, name, category, qty, minQty });
+            inventory.push({ sku, name, buyPrice, salePrice, qty, warranty });
             renderDashboard();
             this.reset();
             bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
         });
 
-        function updateStock(index, amount) {
-            if (inventory[index].qty + amount >= 0) {
-                inventory[index].qty += amount;
-                renderDashboard();
-            }
-        }
-
         function deleteItem(index) {
-            if (confirm('মালামালটি মুছে ফেলতে চান?')) {
+            if (confirm('মুছে ফেলতে চান?')) {
                 inventory.splice(index, 1);
                 renderDashboard();
             }
         }
 
-        // Render Servicing Jobs
-        function renderServicing() {
-            const tbody = document.getElementById('servicingTableBody');
-            tbody.innerHTML = '';
+        function renderAccounts() {
+            const accBody = document.getElementById('accountsTableBody');
+            accBody.innerHTML = '';
 
-            servicingJobs.forEach((job, index) => {
-                let statusBadge = 'bg-warning text-dark';
-                if(job.status === 'In Progress') statusBadge = 'bg-info text-dark';
-                if(job.status === 'Repaired') statusBadge = 'bg-primary';
-                if(job.status === 'Delivered') statusBadge = 'bg-success';
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><code>#JOB-${1001 + index}</code></td>
-                    <td><strong>${job.customer}</strong><br><small class="text-muted">${job.phone}</small></td>
-                    <td>${job.device}</td>
-                    <td><small>${job.problem}</small></td>
-                    <td>৳ ${job.bill}</td>
-                    <td>
-                        <select class="form-select form-select-sm ${statusBadge}" onchange="changeServiceStatus(${index}, this.value)">
-                            <option value="Pending" ${job.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                            <option value="In Progress" ${job.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                            <option value="Repaired" ${job.status === 'Repaired' ? 'selected' : ''}>Repaired</option>
-                            <option value="Delivered" ${job.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteService(${index})"><i class="fa-solid fa-trash"></i></button>
-                    </td>
+            salesList.forEach((sale) => {
+                const itemListStr = sale.items ? sale.items.map(i => `${i.name} (x${i.qty})`).join(', ') : 'N/A';
+                const accTr = document.createElement('tr');
+                accTr.innerHTML = `
+                    <td>${sale.date}</td>
+                    <td>${sale.customer} (${sale.phone})</td>
+                    <td>${itemListStr}</td>
+                    <td>৳ ${sale.totalAmount}</td>
                 `;
-                tbody.appendChild(tr);
+                accBody.appendChild(accTr);
             });
-
-            localStorage.setItem('it_servicing', JSON.stringify(servicingJobs));
         }
 
-        document.getElementById('serviceForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const customer = document.getElementById('sCustomer').value.trim();
-            const phone = document.getElementById('sPhone').value.trim();
-            const device = document.getElementById('sDevice').value.trim();
-            const problem = document.getElementById('sProblem').value.trim();
-            const bill = Number(document.getElementById('sBill').value) || 0;
-
-            servicingJobs.push({ customer, phone, device, problem, bill, status: 'Pending' });
-            renderServicing();
-            this.reset();
-            bootstrap.Modal.getInstance(document.getElementById('addServiceModal')).hide();
-        });
-
-        function changeServiceStatus(index, newStatus) {
-            servicingJobs[index].status = newStatus;
-            renderServicing();
-        }
-
-        function deleteService(index) {
-            if (confirm('সার্ভিস জবটি মুছে ফেলতে চান?')) {
-                servicingJobs.splice(index, 1);
-                renderServicing();
-            }
-        }
-
-        // Default IT Sample Data
         function seedITSampleData() {
             inventory = [
-                { sku: 'RAM-D4-8G', name: 'Corsair Vengeance 8GB DDR4 3200MHz', category: 'RAM', qty: 15, minQty: 5 },
-                { sku: 'SSD-512G-NVME', name: 'Kingston NV2 512GB PCIe 4.0 NVMe M.2', category: 'SSD / NVMe', qty: 10, minQty: 3 },
-                { sku: 'HDD-1TB-WD', name: 'WD Blue 1TB 3.5 Inch SATA Hard Drive', category: 'Hard Disk', qty: 6, minQty: 2 },
-                { sku: 'PSU-550W', name: 'Corsair CV550 550W 80 Plus Bronze', category: 'Power Supply', qty: 4, minQty: 2 },
-                { sku: 'MB-H510', name: 'MSI H510M-A PRO Intel Motherboard', category: 'Motherboard', qty: 3, minQty: 2 },
-                { sku: 'CC-DOM-2MP', name: 'Dahua 2MP HDCVI IR Dome Camera', category: 'CC Camera', qty: 25, minQty: 5 },
-                { sku: 'TONER-85A', name: 'HP 85A LaserJet Toner Cartridge', category: 'Toner', qty: 8, minQty: 3 },
-                { sku: 'ROUTER-WR844N', name: 'TP-Link TL-WR844N 300Mbps Wi-Fi Router', category: 'Router', qty: 12, minQty: 4 },
-                { sku: 'SW-8P-DLink', name: 'D-Link DES-1008A 8-Port Fast Ethernet Switch', category: 'Network Switch', qty: 7, minQty: 2 },
-                { sku: 'SW-16P-TPLINK', name: 'TP-Link TL-SF1016D 16-Port Switch', category: 'Network Switch', qty: 3, minQty: 1 },
-                { sku: 'SW-32P-TPLINK', name: 'TP-Link TL-SG1032D 32-Port Gigabit Switch', category: 'Network Switch', qty: 1, minQty: 1 }
+                { sku: 'RAM-D4-8G', name: 'Corsair Vengeance 8GB DDR4 3200MHz', buyPrice: 2100, salePrice: 2600, qty: 10, warranty: '3 Years' },
+                { sku: 'SSD-512G', name: 'Kingston NV2 512GB PCIe 4.0 NVMe M.2', buyPrice: 3200, salePrice: 3800, qty: 10, warranty: '3 Years' },
+                { sku: 'HDD-1TB', name: 'WD Blue 1TB 3.5 Inch SATA Hard Drive', buyPrice: 4000, salePrice: 4800, qty: 6, warranty: '2 Years' }
             ];
-
-            servicingJobs = [
-                { customer: 'কামরুল হাসান', phone: '01711002233', device: 'Desktop PC (Core i5 10th Gen)', problem: 'পাওয়ার আসে কিন্তু মনিটরে ডিসপ্লে আসে না', bill: 800, status: 'In Progress' },
-                { customer: 'এম এ হাসনাত', phone: '01899112233', device: 'Canon IR 2006 Photocopy Machine', problem: 'প্রিন্ট করার সময় কালি অস্পষ্ট ও পেপার জাম হয়', bill: 2500, status: 'Pending' }
-            ];
-
+            salesList = [];
             renderDashboard();
-            renderServicing();
         }
-
-        // Camera QR Init
-        const html5QrCode = new Html5Qrcode("reader");
-        const qrCodeSuccessCallback = (decodedText) => {
-            const scanResult = document.getElementById('scanResult');
-            scanResult.classList.remove('d-none');
-            const itemIndex = inventory.findIndex(i => i.sku.toLowerCase() === decodedText.toLowerCase());
-
-            if (itemIndex !== -1) {
-                scanResult.className = "alert alert-success mt-3 text-center";
-                scanResult.innerHTML = `<strong>স্ক্যান সফল!</strong> ${inventory[itemIndex].name} পাওয়া গেছে (স্টক: ${inventory[itemIndex].qty})`;
-                inventory[itemIndex].qty += 1;
-                renderDashboard();
-            } else {
-                scanResult.className = "alert alert-warning mt-3 text-center";
-                scanResult.innerHTML = `<strong>নতুন বারকোড:</strong> ${decodedText}। নতুন প্রোডাক্ট যোগ করতে "নতুন IT প্রোডাক্ট ইনপুট দিন" বাটনে ক্লিক করুন।`;
-            }
-        };
-
-        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 200, height: 200 } }, qrCodeSuccessCallback)
-            .catch(() => {
-                document.getElementById('reader').innerHTML = `<div class="p-3 text-center text-muted"><small>ক্যামেরা পারমিশন অ্যালাউ করুন বা ব্রাউজারের Lock আইকনে ক্লিক করুন।</small></div>`;
-            });
 
         if (inventory.length === 0) seedITSampleData();
-        else {
-            renderDashboard();
-            renderServicing();
-        }
+        else renderDashboard();
     </script>
 </body>
-</html>
+                                                                         </html>
