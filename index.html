@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Store - POS & Invoice System</title>
+    <title>IT Store - Invoice & Delivery System</title>
     
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -53,12 +53,6 @@
             padding: 15px;
             margin-bottom: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-
-        .product-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
         }
 
         .btn-gradient {
@@ -84,11 +78,30 @@
             font-family: 'Times New Roman', Times, serif;
             font-size: 14px;
             color: #000;
+            line-height: 1.6;
         }
 
         .invoice-table th, .invoice-table td {
             border: 1px solid #000;
             padding: 8px;
+        }
+
+        .invoice-table th {
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .price-input {
+            width: 100px;
+            border: 1px solid #ddd;
+            padding: 4px;
+            text-align: right;
+        }
+
+        .qty-input {
+            width: 80px;
+            border: 1px solid #ddd;
+            padding: 4px;
             text-align: center;
         }
 
@@ -303,8 +316,8 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Print Preview (A4 Size)</h5>
                     <div class="ms-auto">
-                        <button class="btn btn-primary btn-sm me-2" onclick="switchDocType('invoice')">INVOICE</button>
-                        <button class="btn btn-info btn-sm text-white" onclick="switchDocType('chalan')">DELIVERY CHALAN</button>
+                        <button class="btn btn-primary btn-sm me-2" id="btnInvoice" onclick="switchDocType('invoice')">INVOICE</button>
+                        <button class="btn btn-info btn-sm text-white" id="btnChalan" onclick="switchDocType('chalan')">DELIVERY CHALAN</button>
                     </div>
                     <button type="button" class="btn-close ms-2" data-bs-dismiss="modal"></button>
                 </div>
@@ -330,24 +343,55 @@
                                 <p class="mb-1"><strong>Date:</strong> <span id="invDate"></span></p>
                             </div>
                         </div>
-                        <table class="table invoice-table w-100" id="invoiceTable">
-                            <thead>
-                                <tr>
-                                    <th>SL/No</th>
-                                    <th>Description</th>
-                                    <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Total Price</th>
-                                </tr>
-                            </thead>
-                            <tbody id="invoiceItems"></tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="4" class="text-end fw-bold">Total Price</td>
-                                    <td class="fw-bold" id="invoiceTotal">0.00</td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        
+                        <!-- INVOICE TABLE -->
+                        <div id="invoiceSection">
+                            <table class="table invoice-table w-100" id="invoiceTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%">SL/No</th>
+                                        <th style="width: 40%">Description</th>
+                                        <th style="width: 15%">Quantity</th>
+                                        <th style="width: 15%">Unit Price</th>
+                                        <th style="width: 20%">Total Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoiceItems"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="text-end fw-bold">Total Price</td>
+                                        <td class="fw-bold" id="invoiceTotal">0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" class="text-start">
+                                            <strong>In Words:</strong> <span id="amountInWords">Zero Only</span>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <button class="btn btn-primary btn-sm mt-2" onclick="addInvoiceRow()">
+                                <i class="fa-solid fa-plus me-1"></i>+ Add Row
+                            </button>
+                        </div>
+
+                        <!-- DELIVERY CHALAN TABLE -->
+                        <div id="chalanSection" style="display:none;">
+                            <table class="table invoice-table w-100" id="chalanTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%">SL/No</th>
+                                        <th style="width: 50%">Description</th>
+                                        <th style="width: 20%">Quantity</th>
+                                        <th style="width: 20%">Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="chalanItems"></tbody>
+                            </table>
+                            <button class="btn btn-primary btn-sm mt-2" onclick="addChalanRow()">
+                                <i class="fa-solid fa-plus me-1"></i>+ Add Row
+                            </button>
+                        </div>
+
                         <div class="mt-4">
                             <p>Thanking you and assuring you our best services at all times</p>
                             <p>Sincerely yours,</p>
@@ -433,6 +477,54 @@
         let currentUser = null;
         let currentInvoice = null;
         let docType = 'invoice';
+        let invoiceRowCounter = 0;
+        let chalanRowCounter = 0;
+
+        // Number to Words Function
+        function numberToWords(num) {
+            if (num === 0) return 'Zero Only';
+            
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            
+            function convertLessThanOneThousand(n) {
+                if (n === 0) return '';
+                if (n < 10) return ones[n];
+                if (n < 20) return teens[n - 10];
+                if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
+                return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + convertLessThanOneThousand(n % 100) : '');
+            }
+            
+            function convertNumber(n) {
+                if (n === 0) return 'Zero';
+                
+                const billion = Math.floor(n / 1000000000);
+                const million = Math.floor((n % 1000000000) / 1000000);
+                const thousand = Math.floor((n % 1000000) / 1000);
+                const remainder = n % 1000;
+                
+                let result = '';
+                
+                if (billion > 0) result += convertLessThanOneThousand(billion) + ' Billion ';
+                if (million > 0) result += convertLessThanOneThousand(million) + ' Million ';
+                if (thousand > 0) result += convertLessThanOneThousand(thousand) + ' Thousand ';
+                if (remainder > 0) result += convertLessThanOneThousand(remainder);
+                
+                return result.trim();
+            }
+            
+            const integerPart = Math.floor(num);
+            const decimalPart = Math.round((num - integerPart) * 100);
+            
+            let result = convertNumber(integerPart);
+            
+            if (decimalPart > 0) {
+                result += ' and ' + convertNumber(decimalPart) + ' Paisa';
+            }
+            
+            return result + ' Only';
+        }
 
         // Auth Functions
         function showRegister() {
@@ -675,32 +767,105 @@
             document.getElementById('invDate').textContent = new Date().toLocaleDateString('en-GB');
             document.getElementById('invSubject').textContent = currentInvoice.items.map(i => i.name).join(', ');
             
-            const tbody = document.getElementById('invoiceItems');
-            tbody.innerHTML = '';
+            // Generate Invoice Items
+            const invTbody = document.getElementById('invoiceItems');
+            invTbody.innerHTML = '';
+            invoiceRowCounter = 0;
             
             currentInvoice.items.forEach((item, idx) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${String(idx + 1).padStart(2, '0')}</td>
-                    <td class="text-start">${item.name}</td>
-                    <td>${item.qty} pcs</td>
-                    <td>${item.price.toFixed(2)}</td>
-                    <td>${(item.price * item.qty).toFixed(2)}</td>
-                `;
-                tbody.appendChild(tr);
+                invoiceRowCounter++;
+                const tr = createInvoiceRow(invoiceRowCounter, item.name, item.qty, item.price);
+                invTbody.appendChild(tr);
             });
             
-            document.getElementById('invoiceTotal').textContent = currentInvoice.total.toFixed(2);
+            // Generate Chalan Items
+            const chalTbody = document.getElementById('chalanItems');
+            chalTbody.innerHTML = '';
+            chalanRowCounter = 0;
+            
+            currentInvoice.items.forEach((item, idx) => {
+                chalanRowCounter++;
+                const tr = createChalanRow(chalanRowCounter, item.name, item.qty);
+                chalTbody.appendChild(tr);
+            });
+            
+            calculateInvoiceTotal();
+        }
+
+        function createInvoiceRow(sl, desc, qty, price) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${String(sl).padStart(2, '0')}.</td>
+                <td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none;"></td>
+                <td><input type="number" class="qty-input" value="${qty}" onchange="calculateInvoiceTotal()"></td>
+                <td><input type="number" class="price-input" value="${price}" onchange="calculateInvoiceTotal()"></td>
+                <td class="row-total">${(qty * price).toFixed(2)}</td>
+            `;
+            return tr;
+        }
+
+        function createChalanRow(sl, desc, qty) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${String(sl).padStart(2, '0')}.</td>
+                <td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none;"></td>
+                <td><input type="text" class="form-control form-control-sm" value="${qty}pcs" style="border:none;"></td>
+                <td><input type="text" class="form-control form-control-sm" placeholder="Remark" style="border:none;"></td>
+            `;
+            return tr;
+        }
+
+        function addInvoiceRow() {
+            invoiceRowCounter++;
+            const tbody = document.getElementById('invoiceItems');
+            const tr = createInvoiceRow(invoiceRowCounter, 'New item details', 1, 0);
+            tbody.appendChild(tr);
+            calculateInvoiceTotal();
+        }
+
+        function addChalanRow() {
+            chalanRowCounter++;
+            const tbody = document.getElementById('chalanItems');
+            const tr = createChalanRow(chalanRowCounter, 'New item details', 1);
+            tbody.appendChild(tr);
+        }
+
+        function calculateInvoiceTotal() {
+            const rows = document.querySelectorAll('#invoiceItems tr');
+            let total = 0;
+            
+            rows.forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                const price = parseFloat(row.querySelector('.price-input').value) || 0;
+                const rowTotal = qty * price;
+                row.querySelector('.row-total').textContent = rowTotal.toFixed(2);
+                total += rowTotal;
+            });
+            
+            document.getElementById('invoiceTotal').textContent = total.toFixed(2);
+            document.getElementById('amountInWords').textContent = numberToWords(total);
         }
 
         function switchDocType(type) {
             docType = type;
             if (type === 'chalan') {
-                document.getElementById('docTitle').textContent = 'DELIVERY CHALAN';
-                document.getElementById('invNoLabel').textContent = 'Challan No:';
+                document.getElementById('docTitle').textContent = 'DELIVERY/CHALAN';
+                document.getElementById('invNoLabel').textContent = 'CHALLAN No:';
+                document.getElementById('invoiceSection').style.display = 'none';
+                document.getElementById('chalanSection').style.display = 'block';
+                document.getElementById('btnChalan').classList.remove('btn-info');
+                document.getElementById('btnChalan').classList.add('btn-primary');
+                document.getElementById('btnInvoice').classList.remove('btn-primary');
+                document.getElementById('btnInvoice').classList.add('btn-info');
             } else {
                 document.getElementById('docTitle').textContent = 'INVOICE/BILL';
                 document.getElementById('invNoLabel').textContent = 'Invoice No:';
+                document.getElementById('invoiceSection').style.display = 'block';
+                document.getElementById('chalanSection').style.display = 'none';
+                document.getElementById('btnInvoice').classList.remove('btn-info');
+                document.getElementById('btnInvoice').classList.add('btn-primary');
+                document.getElementById('btnChalan').classList.remove('btn-primary');
+                document.getElementById('btnChalan').classList.add('btn-info');
             }
         }
 
@@ -712,31 +877,62 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
+            const title = docType === 'invoice' ? 'INVOICE/BILL' : 'DELIVERY/CHALAN';
             doc.setFontSize(20);
-            doc.text(docType === 'invoice' ? 'INVOICE/BILL' : 'DELIVERY CHALAN', 105, 20, { align: 'center' });
+            doc.text(title, 105, 20, { align: 'center' });
             
             doc.setFontSize(12);
             doc.text(`To: ${currentInvoice.customer} (${currentInvoice.phone})`, 14, 40);
             doc.text(`${docType === 'invoice' ? 'Invoice' : 'Challan'} No: ${currentInvoice.invoiceNo}`, 140, 40);
             doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, 140, 48);
             
-            const tableData = currentInvoice.items.map((item, idx) => [
-                String(idx + 1).padStart(2, '0'),
-                item.name,
-                `${item.qty} pcs`,
-                item.price.toFixed(2),
-                (item.price * item.qty).toFixed(2)
-            ]);
+            if (docType === 'invoice') {
+                const tableData = [];
+                document.querySelectorAll('#invoiceItems tr').forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    tableData.push([
+                        cells[0].textContent,
+                        cells[1].querySelector('input').value,
+                        cells[2].querySelector('input').value + 'pcs',
+                        cells[3].querySelector('input').value,
+                        cells[4].textContent
+                    ]);
+                });
+                
+                doc.autoTable({
+                    startY: 60,
+                    head: [['SL/No', 'Description', 'Quantity', 'Unit Price', 'Total Price']],
+                    body: tableData,
+                });
+                
+                const total = document.getElementById('invoiceTotal').textContent;
+                doc.text(`Total Price: ৳${total}`, 140, doc.lastAutoTable.finalY + 10);
+                doc.text(`In Words: ${document.getElementById('amountInWords').textContent}`, 14, doc.lastAutoTable.finalY + 18);
+            } else {
+                const tableData = [];
+                document.querySelectorAll('#chalanItems tr').forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    tableData.push([
+                        cells[0].textContent,
+                        cells[1].querySelector('input').value,
+                        cells[2].querySelector('input').value,
+                        cells[3].querySelector('input').value
+                    ]);
+                });
+                
+                doc.autoTable({
+                    startY: 60,
+                    head: [['SL/No', 'Description', 'Quantity', 'Remark']],
+                    body: tableData,
+                });
+            }
             
-            doc.autoTable({
-                startY: 60,
-                head: [['SL', 'Description', 'Quantity', 'Unit Price', 'Total']],
-                body: tableData,
-            });
+            doc.text('Thanking you and assuring you our best services at all times', 14, doc.lastAutoTable.finalY + 20);
+            doc.text('Sincerely yours,', 14, doc.lastAutoTable.finalY + 28);
+            doc.text('Md. Nacher Uddin Reaz', 14, doc.lastAutoTable.finalY + 40);
+            doc.text('Proprietor of Amin Computer', 14, doc.lastAutoTable.finalY + 46);
             
-            doc.text(`Total: ৳${currentInvoice.total.toFixed(2)}`, 140, doc.lastAutoTable.finalY + 10);
-            
-            doc.save(`${currentInvoice.invoiceNo}.pdf`);
+            doc.save(`${currentInvoice.invoiceNo}_${docType}.pdf`);
         }
 
         async function loadSales() {
@@ -771,6 +967,7 @@
             const sale = sales.find(s => s.id === saleId);
             currentInvoice = sale;
             generateInvoice();
+            switchDocType('invoice');
             new bootstrap.Modal(document.getElementById('invoiceModal')).show();
         }
 
@@ -825,4 +1022,4 @@
         auth.onAuthStateChanged(() => loadApp());
     </script>
 </body>
-</html>
+    </html>
