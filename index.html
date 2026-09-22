@@ -42,13 +42,27 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+        
+        /* Enhanced Product Card Design */
         .product-card {
             background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #eef2f7;
         }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        .product-card h6 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
         .cart-badge {
             position: absolute;
             top: -8px;
@@ -75,17 +89,20 @@
             text-align: center;
             background: #f8f9fa;
         }
-        .price-input {
-            width: 100px;
-            border: 1px solid #ddd;
-            padding: 4px;
-            text-align: right;
-        }
-        .qty-input {
-            width: 80px;
+        .price-input, .qty-input {
+            width: 100%;
             border: 1px solid #ddd;
             padding: 4px;
             text-align: center;
+            background: transparent;
+        }
+        .editable-field {
+            border: 1px dashed #aaa !important;
+            background: #fdfdfd !important;
+            display: inline-block !important;
+            padding: 2px 8px !important;
+            font-family: 'Times New Roman', Times, serif !important;
+            font-size: 14px !important;
         }
         .loading-spinner {
             display: none;
@@ -95,6 +112,9 @@
             transform: translate(-50%, -50%);
             z-index: 9999;
         }
+        
+        /* Hide elements during print */
+        .no-print { display: block; }
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
@@ -106,6 +126,7 @@
                 padding: 20px;
                 background: white;
             }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
@@ -321,18 +342,18 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-6">
-                                <p class="mb-1"><strong>To:</strong> <span id="invCustomer"></span></p>
+                                <p class="mb-1"><strong>To:</strong> <input type="text" id="invCustomer" class="form-control form-control-sm editable-field" style="width: 65%;"></p>
                             </div>
                             <div class="col-6 text-end">
-                                <p class="mb-1"><strong id="invNoLabel">Invoice No:</strong> <span id="invNumber"></span></p>
+                                <p class="mb-1"><strong id="invNoLabel">Invoice No:</strong> <input type="text" id="invNumber" class="form-control form-control-sm editable-field" style="width: 45%;"></p>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-6">
-                                <p class="mb-1"><strong>Subject:</strong> <span id="invSubject"></span></p>
+                                <p class="mb-1"><strong>Subject:</strong> <input type="text" id="invSubject" class="form-control form-control-sm editable-field" style="width: 75%;"></p>
                             </div>
                             <div class="col-6 text-end">
-                                <p class="mb-1"><strong>Date:</strong> <span id="invDate"></span></p>
+                                <p class="mb-1"><strong>Date:</strong> <input type="text" id="invDate" class="form-control form-control-sm editable-field" style="width: 45%;"></p>
                             </div>
                         </div>
                         
@@ -360,7 +381,7 @@
                                     </tr>
                                 </tfoot>
                             </table>
-                            <button class="btn btn-primary btn-sm mt-2" onclick="addInvoiceRow()">
+                            <button class="btn btn-primary btn-sm mt-2 no-print" onclick="addInvoiceRow()">
                                 <i class="fa-solid fa-plus me-1"></i>+ Add Row
                             </button>
                         </div>
@@ -370,14 +391,13 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 10%">SL/No</th>
-                                        <th style="width: 50%">Description</th>
-                                        <th style="width: 20%">Quantity</th>
-                                        <th style="width: 20%">Remark</th>
+                                        <th style="width: 60%">Description</th>
+                                        <th style="width: 30%">Quantity</th>
                                     </tr>
                                 </thead>
                                 <tbody id="chalanItems"></tbody>
                             </table>
-                            <button class="btn btn-primary btn-sm mt-2" onclick="addChalanRow()">
+                            <button class="btn btn-primary btn-sm mt-2 no-print" onclick="addChalanRow()">
                                 <i class="fa-solid fa-plus me-1"></i>+ Add Row
                             </button>
                         </div>
@@ -621,7 +641,7 @@
                 document.getElementById('navUserManagement').style.display = 'none';
             } else {
                 document.getElementById('navUserManagement').style.display = 'block';
-                await loadUsers(); // Load users if admin
+                await loadUsers();
             }
 
             await loadProducts();
@@ -663,22 +683,15 @@
 
             try {
                 document.getElementById('loadingSpinner').style.display = 'block';
-                
-                // Creates user AND logs them in
                 const cred = await auth.createUserWithEmailAndPassword(email, password);
-                
-                // Save user data to Firestore
                 await db.collection('users').doc(cred.user.uid).set({
                     name, email, role,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
-                // Sign out the newly created user immediately for security
                 await auth.signOut();
-                
                 document.getElementById('loadingSpinner').style.display = 'none';
                 alert('ইউজার সফলভাবে তৈরি হয়েছে!\n\nনিরাপত্তার স্বার্থে আপনাকে লগআউট করা হয়েছে। দয়া করে আবার অ্যাডমিন হিসেবে লগইন করুন।');
-                location.reload(); // Reload to go back to login screen
+                location.reload();
             } catch (error) {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 alert('ইউজার তৈরি করতে সমস্যা হয়েছে: ' + error.message);
@@ -701,10 +714,7 @@
 
             try {
                 document.getElementById('loadingSpinner').style.display = 'block';
-                await db.collection('users').doc(uid).update({
-                    name: name,
-                    role: role
-                });
+                await db.collection('users').doc(uid).update({ name: name, role: role });
                 document.getElementById('loadingSpinner').style.display = 'none';
                 bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
                 alert('ইউজার তথ্য সফলভাবে আপডেট হয়েছে!');
@@ -748,10 +758,13 @@
                     div.innerHTML = `
                         <div class="product-card">
                             <h6 class="fw-bold">${product.name}</h6>
-                            <p class="text-muted mb-1"><small>SKU: ${product.sku}</small></p>
-                            <p class="mb-1">Buy: ৳${product.buyPrice} | Sell: ৳${product.salePrice}</p>
-                            <p class="mb-2">Stock: <span class="badge ${product.qty <= 5 ? 'bg-danger' : 'bg-success'}">${product.qty}</span></p>
-                            <button class="btn btn-sm btn-primary w-100" onclick="addToCart('${product.id}')" ${product.qty <= 0 ? 'disabled' : ''}>
+                            <p class="text-muted mb-2"><small class="bg-light px-2 py-1 rounded">SKU: ${product.sku}</small></p>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Buy: ৳${product.buyPrice}</span>
+                                <span class="fw-bold text-primary">Sell: ৳${product.salePrice}</span>
+                            </div>
+                            <p class="mb-3">Stock: <span class="badge ${product.qty <= 5 ? 'bg-danger' : 'bg-success'} px-3 py-2">${product.qty}</span></p>
+                            <button class="btn btn-primary w-100" onclick="addToCart('${product.id}')" ${product.qty <= 0 ? 'disabled' : ''}>
                                 <i class="fa-solid fa-cart-plus me-1"></i>Add to Cart
                             </button>
                         </div>
@@ -851,10 +864,10 @@
 
         function generateInvoice() {
             if (!currentInvoice) return;
-            document.getElementById('invCustomer').textContent = `${currentInvoice.customer} (${currentInvoice.phone})`;
-            document.getElementById('invNumber').textContent = currentInvoice.invoiceNo;
-            document.getElementById('invDate').textContent = new Date().toLocaleDateString('en-GB');
-            document.getElementById('invSubject').textContent = currentInvoice.items.map(i => i.name).join(', ');
+            document.getElementById('invCustomer').value = `${currentInvoice.customer} (${currentInvoice.phone})`;
+            document.getElementById('invNumber').value = currentInvoice.invoiceNo;
+            document.getElementById('invDate').value = new Date().toLocaleDateString('en-GB');
+            document.getElementById('invSubject').value = currentInvoice.items.map(i => i.name).join(', ');
             
             const invTbody = document.getElementById('invoiceItems');
             invTbody.innerHTML = '';
@@ -878,10 +891,10 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${String(sl).padStart(2, '0')}.</td>
-                <td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none;"></td>
+                <td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none; background:transparent;"></td>
                 <td><input type="number" class="qty-input" value="${qty}" onchange="calculateInvoiceTotal()"></td>
                 <td><input type="number" class="price-input" value="${price}" onchange="calculateInvoiceTotal()"></td>
-                <td class="row-total">${(qty * price).toFixed(2)}</td>
+                <td class="row-total text-end">${(qty * price).toFixed(2)}</td>
             `;
             return tr;
         }
@@ -890,9 +903,8 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${String(sl).padStart(2, '0')}.</td>
-                <td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none;"></td>
-                <td><input type="text" class="form-control form-control-sm" value="${qty}pcs" style="border:none;"></td>
-                <td><input type="text" class="form-control form-control-sm" placeholder="Remark" style="border:none;"></td>
+                <td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none; background:transparent;"></td>
+                <td><input type="text" class="form-control form-control-sm" value="${qty} pcs" style="border:none; background:transparent;"></td>
             `;
             return tr;
         }
@@ -925,7 +937,7 @@
         function switchDocType(type) {
             docType = type;
             if (type === 'chalan') {
-                document.getElementById('docTitle').textContent = 'DELIVERY/CHALAN';
+                document.getElementById('docTitle').textContent = 'DELIVERY CHALAN';
                 document.getElementById('invNoLabel').textContent = 'CHALLAN No:';
                 document.getElementById('invoiceSection').style.display = 'none';
                 document.getElementById('chalanSection').style.display = 'block';
@@ -946,36 +958,60 @@
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const title = docType === 'invoice' ? 'INVOICE/BILL' : 'DELIVERY/CHALAN';
+            const title = docType === 'invoice' ? 'INVOICE/BILL' : 'DELIVERY CHALAN';
+            
+            // Read from editable fields for PDF
+            const custName = document.getElementById('invCustomer').value;
+            const invNo = document.getElementById('invNumber').value;
+            const invDate = document.getElementById('invDate').value;
+            
             doc.setFontSize(20);
             doc.text(title, 105, 20, { align: 'center' });
             doc.setFontSize(12);
-            doc.text(`To: ${currentInvoice.customer} (${currentInvoice.phone})`, 14, 40);
-            doc.text(`${docType === 'invoice' ? 'Invoice' : 'Challan'} No: ${currentInvoice.invoiceNo}`, 140, 40);
-            doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, 140, 48);
+            doc.text(`To: ${custName}`, 14, 40);
+            doc.text(`${docType === 'invoice' ? 'Invoice' : 'Challan'} No: ${invNo}`, 140, 40);
+            doc.text(`Date: ${invDate}`, 140, 48);
             
             if (docType === 'invoice') {
                 const tableData = [];
                 document.querySelectorAll('#invoiceItems tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    tableData.push([cells[0].textContent, cells[1].querySelector('input').value, cells[2].querySelector('input').value + 'pcs', cells[3].querySelector('input').value, cells[4].textContent]);
+                    tableData.push([
+                        cells[0].textContent, 
+                        cells[1].querySelector('input').value, 
+                        cells[2].querySelector('input').value + ' pcs', 
+                        cells[3].querySelector('input').value, 
+                        cells[4].textContent
+                    ]);
                 });
-                doc.autoTable({ startY: 60, head: [['SL/No', 'Description', 'Quantity', 'Unit Price', 'Total Price']], body: tableData });
+                doc.autoTable({ 
+                    startY: 60, 
+                    head: [['SL/No', 'Description', 'Quantity', 'Unit Price', 'Total Price']], 
+                    body: tableData 
+                });
                 doc.text(`Total Price: ৳${document.getElementById('invoiceTotal').textContent}`, 140, doc.lastAutoTable.finalY + 10);
                 doc.text(`In Words: ${document.getElementById('amountInWords').textContent}`, 14, doc.lastAutoTable.finalY + 18);
             } else {
                 const tableData = [];
                 document.querySelectorAll('#chalanItems tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    tableData.push([cells[0].textContent, cells[1].querySelector('input').value, cells[2].querySelector('input').value, cells[3].querySelector('input').value]);
+                    tableData.push([
+                        cells[0].textContent, 
+                        cells[1].querySelector('input').value, 
+                        cells[2].querySelector('input').value
+                    ]);
                 });
-                doc.autoTable({ startY: 60, head: [['SL/No', 'Description', 'Quantity', 'Remark']], body: tableData });
+                doc.autoTable({ 
+                    startY: 60, 
+                    head: [['SL/No', 'Description', 'Quantity']], // Remark removed
+                    body: tableData 
+                });
             }
             doc.text('Thanking you and assuring you our best services at all times', 14, doc.lastAutoTable.finalY + 20);
             doc.text('Sincerely yours,', 14, doc.lastAutoTable.finalY + 28);
             doc.text('Md. Nacher Uddin Reaz', 14, doc.lastAutoTable.finalY + 40);
             doc.text('Proprietor of Amin Computer', 14, doc.lastAutoTable.finalY + 46);
-            doc.save(`${currentInvoice.invoiceNo}_${docType}.pdf`);
+            doc.save(`${invNo}_${docType}.pdf`);
         }
 
         async function loadSales() {
