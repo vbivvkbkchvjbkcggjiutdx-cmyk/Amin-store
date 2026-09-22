@@ -23,14 +23,12 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-
         .login-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
         .login-box {
             background: white;
             border-radius: 20px;
@@ -39,14 +37,11 @@
             max-width: 450px;
             width: 100%;
         }
-
         .main-app { display: none; }
-
         .navbar-custom {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
         .product-card {
             background: white;
             border-radius: 10px;
@@ -54,13 +49,6 @@
             margin-bottom: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
-        .btn-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-        }
-
         .cart-badge {
             position: absolute;
             top: -8px;
@@ -71,7 +59,6 @@
             padding: 2px 8px;
             font-size: 12px;
         }
-
         .invoice-box {
             background: white;
             padding: 40px;
@@ -80,31 +67,26 @@
             color: #000;
             line-height: 1.6;
         }
-
         .invoice-table th, .invoice-table td {
             border: 1px solid #000;
             padding: 8px;
         }
-
         .invoice-table th {
             text-align: center;
             background: #f8f9fa;
         }
-
         .price-input {
             width: 100px;
             border: 1px solid #ddd;
             padding: 4px;
             text-align: right;
         }
-
         .qty-input {
             width: 80px;
             border: 1px solid #ddd;
             padding: 4px;
             text-align: center;
         }
-
         .loading-spinner {
             display: none;
             position: fixed;
@@ -113,7 +95,6 @@
             transform: translate(-50%, -50%);
             z-index: 9999;
         }
-
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
@@ -150,30 +131,6 @@
                     <input type="password" id="loginPassword" class="form-control" placeholder="পাসওয়ার্ড">
                 </div>
                 <button class="btn btn-primary w-100" onclick="loginUser()">লগইন</button>
-                <div class="text-center mt-3">
-                    <a href="#" onclick="showRegister()">নতুন অ্যাকাউন্ট</a>
-                </div>
-            </div>
-            <div id="registerForm" style="display:none;">
-                <div class="mb-3">
-                    <input type="text" id="regName" class="form-control" placeholder="নাম">
-                </div>
-                <div class="mb-3">
-                    <input type="email" id="regEmail" class="form-control" placeholder="ইমেইল">
-                </div>
-                <div class="mb-3">
-                    <input type="password" id="regPassword" class="form-control" placeholder="পাসওয়ার্ড">
-                </div>
-                <div class="mb-3">
-                    <select id="regRole" class="form-select">
-                        <option value="user">User (কর্মী)</option>
-                        <option value="admin">Admin (মালিক)</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary w-100" onclick="registerUser()">রেজিস্টার</button>
-                <div class="text-center mt-3">
-                    <a href="#" onclick="showLogin()">লগইন</a>
-                </div>
             </div>
         </div>
     </div>
@@ -212,6 +169,11 @@
                         <i class="fa-solid fa-receipt me-2"></i>সেলস হিস্ট্রি
                     </button>
                 </li>
+                <li class="nav-item" id="navUserManagement" style="display:none;">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#userManagement">
+                        <i class="fa-solid fa-users-gear me-2"></i>ইউজার ম্যানেজমেন্ট
+                    </button>
+                </li>
             </ul>
 
             <div class="tab-content">
@@ -227,7 +189,6 @@
                             </button>
                         </div>
                     </div>
-
                     <div class="row" id="productsList"></div>
                 </div>
 
@@ -255,6 +216,37 @@
                                         </tr>
                                     </thead>
                                     <tbody id="salesTable"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Management Tab (Admin Only) -->
+                <div class="tab-pane fade" id="userManagement">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                            <h5 class="mb-0"><i class="fa-solid fa-users-gear me-2"></i>ইউজার ম্যানেজমেন্ট</h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                <i class="fa-solid fa-user-plus me-1"></i>নতুন ইউজার তৈরি করুন
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning border-0">
+                                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                                <strong>গুরুত্বপূর্ণ নোট:</strong> Firebase-এর নিরাপত্তা নিয়মের কারণে, নতুন ইউজার তৈরি করলে আপনার বর্তমান সেশন থেকে অটোমেটিক লগআউট হয়ে যাবে। ইউজার তৈরির পর দয়া করে আবার অ্যাডমিন হিসেবে লগইন করুন।
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>নাম</th>
+                                            <th>ইমেইল</th>
+                                            <th>ভূমিকা (Role)</th>
+                                            <th>অ্যাকশন</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersTableBody"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -344,7 +336,6 @@
                             </div>
                         </div>
                         
-                        <!-- INVOICE TABLE -->
                         <div id="invoiceSection">
                             <table class="table invoice-table w-100" id="invoiceTable">
                                 <thead>
@@ -374,7 +365,6 @@
                             </button>
                         </div>
 
-                        <!-- DELIVERY CHALAN TABLE -->
                         <div id="chalanSection" style="display:none;">
                             <table class="table invoice-table w-100" id="chalanTable">
                                 <thead>
@@ -454,6 +444,78 @@
         </div>
     </div>
 
+    <!-- ADD USER MODAL -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">নতুন ইউজার তৈরি করুন</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm">
+                        <div class="mb-3">
+                            <label class="form-label">নাম</label>
+                            <input type="text" id="newUserName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ইমেইল</label>
+                            <input type="email" id="newUserEmail" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">পাসওয়ার্ড</label>
+                            <input type="password" id="newUserPassword" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ভূমিকা (Role)</label>
+                            <select id="newUserRole" class="form-select">
+                                <option value="user">User (কর্মী)</option>
+                                <option value="admin">Admin (মালিক)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">ইউজার তৈরি করুন</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT USER MODAL -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">ইউজার এডিট করুন</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserUid">
+                        <div class="mb-3">
+                            <label class="form-label">নাম</label>
+                            <input type="text" id="editUserName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ইমেইল</label>
+                            <input type="email" id="editUserEmail" class="form-control" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ভূমিকা (Role)</label>
+                            <select id="editUserRole" class="form-select">
+                                <option value="user">User (কর্মী)</option>
+                                <option value="admin">Admin (মালিক)</option>
+                            </select>
+                        </div>
+                        <div class="alert alert-info py-2" style="font-size: 0.9rem;">
+                            <i class="fa-solid fa-info-circle me-1"></i> পাসওয়ার্ড পরিবর্তন করতে হলে সংশ্লিষ্ট ইউজারকে নিজেই লগইন করে পরিবর্তন করতে হবে, অথবা ইউজারটি ডিলিট করে নতুন করে তৈরি করতে হবে।
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">আপডেট করুন</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -483,7 +545,6 @@
         // Number to Words Function
         function numberToWords(num) {
             if (num === 0) return 'Zero Only';
-            
             const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
             const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
             const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
@@ -495,71 +556,30 @@
                 if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
                 return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + convertLessThanOneThousand(n % 100) : '');
             }
-            
             function convertNumber(n) {
                 if (n === 0) return 'Zero';
-                
                 const billion = Math.floor(n / 1000000000);
                 const million = Math.floor((n % 1000000000) / 1000000);
                 const thousand = Math.floor((n % 1000000) / 1000);
                 const remainder = n % 1000;
-                
                 let result = '';
-                
                 if (billion > 0) result += convertLessThanOneThousand(billion) + ' Billion ';
                 if (million > 0) result += convertLessThanOneThousand(million) + ' Million ';
                 if (thousand > 0) result += convertLessThanOneThousand(thousand) + ' Thousand ';
                 if (remainder > 0) result += convertLessThanOneThousand(remainder);
-                
                 return result.trim();
             }
-            
             const integerPart = Math.floor(num);
             const decimalPart = Math.round((num - integerPart) * 100);
-            
             let result = convertNumber(integerPart);
-            
-            if (decimalPart > 0) {
-                result += ' and ' + convertNumber(decimalPart) + ' Paisa';
-            }
-            
+            if (decimalPart > 0) result += ' and ' + convertNumber(decimalPart) + ' Paisa';
             return result + ' Only';
         }
 
         // Auth Functions
-        function showRegister() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-        }
-
-        function showLogin() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('registerForm').style.display = 'none';
-        }
-
-        async function registerUser() {
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const role = document.getElementById('regRole').value;
-
-            try {
-                const cred = await auth.createUserWithEmailAndPassword(email, password);
-                await db.collection('users').doc(cred.user.uid).set({
-                    name, email, role,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert('Registration successful! Please login.');
-                showLogin();
-            } catch (e) {
-                alert(e.message);
-            }
-        }
-
         async function loginUser() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
             try {
                 const cred = await auth.signInWithEmailAndPassword(email, password);
                 const userDoc = await db.collection('users').doc(cred.user.uid).get();
@@ -570,7 +590,6 @@
                     name: userData.name,
                     role: userData.role
                 }));
-                
                 loadApp();
             } catch (e) {
                 alert('Login failed: ' + e.message);
@@ -599,10 +618,116 @@
 
             if (user.role !== 'admin') {
                 document.getElementById('btnAddProduct').style.display = 'none';
+                document.getElementById('navUserManagement').style.display = 'none';
+            } else {
+                document.getElementById('navUserManagement').style.display = 'block';
+                await loadUsers(); // Load users if admin
             }
 
             await loadProducts();
             await loadSales();
+        }
+
+        // User Management Functions
+        async function loadUsers() {
+            const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            snapshot.forEach(doc => {
+                const u = doc.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">${u.name}</td>
+                    <td>${u.email}</td>
+                    <td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-info'}">${u.role === 'admin' ? 'Admin (মালিক)' : 'User (কর্মী)'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning me-1" onclick="openEditUser('${doc.id}', '${u.name}', '${u.email}', '${u.role}')">
+                            <i class="fa-solid fa-pen"></i> এডিট
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}')">
+                            <i class="fa-solid fa-trash"></i> ডিলিট
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('newUserName').value;
+            const email = document.getElementById('newUserEmail').value;
+            const password = document.getElementById('newUserPassword').value;
+            const role = document.getElementById('newUserRole').value;
+
+            try {
+                document.getElementById('loadingSpinner').style.display = 'block';
+                
+                // Creates user AND logs them in
+                const cred = await auth.createUserWithEmailAndPassword(email, password);
+                
+                // Save user data to Firestore
+                await db.collection('users').doc(cred.user.uid).set({
+                    name, email, role,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Sign out the newly created user immediately for security
+                await auth.signOut();
+                
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert('ইউজার সফলভাবে তৈরি হয়েছে!\n\nনিরাপত্তার স্বার্থে আপনাকে লগআউট করা হয়েছে। দয়া করে আবার অ্যাডমিন হিসেবে লগইন করুন।');
+                location.reload(); // Reload to go back to login screen
+            } catch (error) {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert('ইউজার তৈরি করতে সমস্যা হয়েছে: ' + error.message);
+            }
+        });
+
+        function openEditUser(uid, name, email, role) {
+            document.getElementById('editUserUid').value = uid;
+            document.getElementById('editUserName').value = name;
+            document.getElementById('editUserEmail').value = email;
+            document.getElementById('editUserRole').value = role;
+            new bootstrap.Modal(document.getElementById('editUserModal')).show();
+        }
+
+        document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('editUserUid').value;
+            const name = document.getElementById('editUserName').value;
+            const role = document.getElementById('editUserRole').value;
+
+            try {
+                document.getElementById('loadingSpinner').style.display = 'block';
+                await db.collection('users').doc(uid).update({
+                    name: name,
+                    role: role
+                });
+                document.getElementById('loadingSpinner').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+                alert('ইউজার তথ্য সফলভাবে আপডেট হয়েছে!');
+                loadUsers();
+            } catch (error) {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert('আপডেট করতে সমস্যা হয়েছে: ' + error.message);
+            }
+        });
+
+        async function deleteUser(uid, name) {
+            if (confirm(`আপনি কি নিশ্চিত যে আপনি '${name}' কে ডিলিট করতে চান? এই কাজটি অপরিবর্তনীয়।`)) {
+                try {
+                    document.getElementById('loadingSpinner').style.display = 'block';
+                    await db.collection('users').doc(uid).delete();
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    alert('ইউজার সফলভাবে ডিলিট হয়েছে!');
+                    loadUsers();
+                } catch (error) {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    alert('ডিলিট করতে সমস্যা হয়েছে: ' + error.message);
+                }
+            }
         }
 
         async function loadProducts() {
@@ -615,7 +740,6 @@
         function renderProducts() {
             const container = document.getElementById('productsList');
             const search = document.getElementById('searchProduct').value.toLowerCase();
-            
             container.innerHTML = '';
             products.filter(p => p.name.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search))
                 .forEach(product => {
@@ -640,24 +764,12 @@
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             const existing = cart.find(c => c.id === productId);
-            
             if (existing) {
-                if (existing.qty < product.qty) {
-                    existing.qty++;
-                } else {
-                    alert('Not enough stock!');
-                    return;
-                }
+                if (existing.qty < product.qty) existing.qty++;
+                else { alert('Not enough stock!'); return; }
             } else {
-                cart.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.salePrice,
-                    qty: 1,
-                    maxStock: product.qty
-                });
+                cart.push({ id: product.id, name: product.name, price: product.salePrice, qty: 1, maxStock: product.qty });
             }
-            
             updateCartCount();
             alert('Product added to cart!');
         }
@@ -668,19 +780,13 @@
         }
 
         function openCart() {
-            if (cart.length === 0) {
-                alert('Cart is empty!');
-                return;
-            }
-            
+            if (cart.length === 0) { alert('Cart is empty!'); return; }
             const tbody = document.getElementById('cartTable');
             tbody.innerHTML = '';
             let total = 0;
-            
             cart.forEach((item, index) => {
                 const itemTotal = item.price * item.qty;
                 total += itemTotal;
-                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${item.name}</td>
@@ -691,7 +797,6 @@
                 `;
                 tbody.appendChild(tr);
             });
-            
             document.getElementById('cartTotal').textContent = total;
             new bootstrap.Modal(document.getElementById('cartModal')).show();
         }
@@ -711,37 +816,24 @@
         async function confirmSale() {
             const custName = document.getElementById('custName').value;
             const custPhone = document.getElementById('custPhone').value;
-            
-            if (!custName || !custPhone) {
-                alert('Please fill customer details!');
-                return;
-            }
+            if (!custName || !custPhone) { alert('Please fill customer details!'); return; }
             
             const user = JSON.parse(localStorage.getItem('user'));
             const invoiceNo = 'INV-' + Date.now().toString().slice(-8);
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             
-            // Update stock
             for (const item of cart) {
                 await db.collection('products').doc(item.id).update({
                     qty: firebase.firestore.FieldValue.increment(-item.qty)
                 });
             }
             
-            // Save sale
             const saleData = {
-                invoiceNo,
-                customer: custName,
-                phone: custPhone,
-                items: [...cart],
-                total,
-                soldBy: user.name,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                invoiceNo, customer: custName, phone: custPhone, items: [...cart], total,
+                soldBy: user.name, createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
-            
             await db.collection('sales').add(saleData);
             
-            // Show invoice
             currentInvoice = saleData;
             bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
             document.getElementById('cartModal').querySelector('button.btn-close').click();
@@ -749,46 +841,36 @@
             generateInvoice();
             new bootstrap.Modal(document.getElementById('invoiceModal')).show();
             
-            // Reset
             cart = [];
             updateCartCount();
             document.getElementById('custName').value = '';
             document.getElementById('custPhone').value = '';
-            
             await loadProducts();
             await loadSales();
         }
 
         function generateInvoice() {
             if (!currentInvoice) return;
-            
             document.getElementById('invCustomer').textContent = `${currentInvoice.customer} (${currentInvoice.phone})`;
             document.getElementById('invNumber').textContent = currentInvoice.invoiceNo;
             document.getElementById('invDate').textContent = new Date().toLocaleDateString('en-GB');
             document.getElementById('invSubject').textContent = currentInvoice.items.map(i => i.name).join(', ');
             
-            // Generate Invoice Items
             const invTbody = document.getElementById('invoiceItems');
             invTbody.innerHTML = '';
             invoiceRowCounter = 0;
-            
-            currentInvoice.items.forEach((item, idx) => {
+            currentInvoice.items.forEach((item) => {
                 invoiceRowCounter++;
-                const tr = createInvoiceRow(invoiceRowCounter, item.name, item.qty, item.price);
-                invTbody.appendChild(tr);
+                invTbody.appendChild(createInvoiceRow(invoiceRowCounter, item.name, item.qty, item.price));
             });
             
-            // Generate Chalan Items
             const chalTbody = document.getElementById('chalanItems');
             chalTbody.innerHTML = '';
             chalanRowCounter = 0;
-            
-            currentInvoice.items.forEach((item, idx) => {
+            currentInvoice.items.forEach((item) => {
                 chalanRowCounter++;
-                const tr = createChalanRow(chalanRowCounter, item.name, item.qty);
-                chalTbody.appendChild(tr);
+                chalTbody.appendChild(createChalanRow(chalanRowCounter, item.name, item.qty));
             });
-            
             calculateInvoiceTotal();
         }
 
@@ -817,23 +899,18 @@
 
         function addInvoiceRow() {
             invoiceRowCounter++;
-            const tbody = document.getElementById('invoiceItems');
-            const tr = createInvoiceRow(invoiceRowCounter, 'New item details', 1, 0);
-            tbody.appendChild(tr);
+            document.getElementById('invoiceItems').appendChild(createInvoiceRow(invoiceRowCounter, 'New item details', 1, 0));
             calculateInvoiceTotal();
         }
 
         function addChalanRow() {
             chalanRowCounter++;
-            const tbody = document.getElementById('chalanItems');
-            const tr = createChalanRow(chalanRowCounter, 'New item details', 1);
-            tbody.appendChild(tr);
+            document.getElementById('chalanItems').appendChild(createChalanRow(chalanRowCounter, 'New item details', 1));
         }
 
         function calculateInvoiceTotal() {
             const rows = document.querySelectorAll('#invoiceItems tr');
             let total = 0;
-            
             rows.forEach(row => {
                 const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
                 const price = parseFloat(row.querySelector('.price-input').value) || 0;
@@ -841,7 +918,6 @@
                 row.querySelector('.row-total').textContent = rowTotal.toFixed(2);
                 total += rowTotal;
             });
-            
             document.getElementById('invoiceTotal').textContent = total.toFixed(2);
             document.getElementById('amountInWords').textContent = numberToWords(total);
         }
@@ -853,34 +929,26 @@
                 document.getElementById('invNoLabel').textContent = 'CHALLAN No:';
                 document.getElementById('invoiceSection').style.display = 'none';
                 document.getElementById('chalanSection').style.display = 'block';
-                document.getElementById('btnChalan').classList.remove('btn-info');
-                document.getElementById('btnChalan').classList.add('btn-primary');
-                document.getElementById('btnInvoice').classList.remove('btn-primary');
-                document.getElementById('btnInvoice').classList.add('btn-info');
+                document.getElementById('btnChalan').classList.replace('btn-info', 'btn-primary');
+                document.getElementById('btnInvoice').classList.replace('btn-primary', 'btn-info');
             } else {
                 document.getElementById('docTitle').textContent = 'INVOICE/BILL';
                 document.getElementById('invNoLabel').textContent = 'Invoice No:';
                 document.getElementById('invoiceSection').style.display = 'block';
                 document.getElementById('chalanSection').style.display = 'none';
-                document.getElementById('btnInvoice').classList.remove('btn-info');
-                document.getElementById('btnInvoice').classList.add('btn-primary');
-                document.getElementById('btnChalan').classList.remove('btn-primary');
-                document.getElementById('btnChalan').classList.add('btn-info');
+                document.getElementById('btnInvoice').classList.replace('btn-info', 'btn-primary');
+                document.getElementById('btnChalan').classList.replace('btn-primary', 'btn-info');
             }
         }
 
-        function printInvoice() {
-            window.print();
-        }
+        function printInvoice() { window.print(); }
 
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
             const title = docType === 'invoice' ? 'INVOICE/BILL' : 'DELIVERY/CHALAN';
             doc.setFontSize(20);
             doc.text(title, 105, 20, { align: 'center' });
-            
             doc.setFontSize(12);
             doc.text(`To: ${currentInvoice.customer} (${currentInvoice.phone})`, 14, 40);
             doc.text(`${docType === 'invoice' ? 'Invoice' : 'Challan'} No: ${currentInvoice.invoiceNo}`, 140, 40);
@@ -890,48 +958,23 @@
                 const tableData = [];
                 document.querySelectorAll('#invoiceItems tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    tableData.push([
-                        cells[0].textContent,
-                        cells[1].querySelector('input').value,
-                        cells[2].querySelector('input').value + 'pcs',
-                        cells[3].querySelector('input').value,
-                        cells[4].textContent
-                    ]);
+                    tableData.push([cells[0].textContent, cells[1].querySelector('input').value, cells[2].querySelector('input').value + 'pcs', cells[3].querySelector('input').value, cells[4].textContent]);
                 });
-                
-                doc.autoTable({
-                    startY: 60,
-                    head: [['SL/No', 'Description', 'Quantity', 'Unit Price', 'Total Price']],
-                    body: tableData,
-                });
-                
-                const total = document.getElementById('invoiceTotal').textContent;
-                doc.text(`Total Price: ৳${total}`, 140, doc.lastAutoTable.finalY + 10);
+                doc.autoTable({ startY: 60, head: [['SL/No', 'Description', 'Quantity', 'Unit Price', 'Total Price']], body: tableData });
+                doc.text(`Total Price: ৳${document.getElementById('invoiceTotal').textContent}`, 140, doc.lastAutoTable.finalY + 10);
                 doc.text(`In Words: ${document.getElementById('amountInWords').textContent}`, 14, doc.lastAutoTable.finalY + 18);
             } else {
                 const tableData = [];
                 document.querySelectorAll('#chalanItems tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    tableData.push([
-                        cells[0].textContent,
-                        cells[1].querySelector('input').value,
-                        cells[2].querySelector('input').value,
-                        cells[3].querySelector('input').value
-                    ]);
+                    tableData.push([cells[0].textContent, cells[1].querySelector('input').value, cells[2].querySelector('input').value, cells[3].querySelector('input').value]);
                 });
-                
-                doc.autoTable({
-                    startY: 60,
-                    head: [['SL/No', 'Description', 'Quantity', 'Remark']],
-                    body: tableData,
-                });
+                doc.autoTable({ startY: 60, head: [['SL/No', 'Description', 'Quantity', 'Remark']], body: tableData });
             }
-            
             doc.text('Thanking you and assuring you our best services at all times', 14, doc.lastAutoTable.finalY + 20);
             doc.text('Sincerely yours,', 14, doc.lastAutoTable.finalY + 28);
             doc.text('Md. Nacher Uddin Reaz', 14, doc.lastAutoTable.finalY + 40);
             doc.text('Proprietor of Amin Computer', 14, doc.lastAutoTable.finalY + 46);
-            
             doc.save(`${currentInvoice.invoiceNo}_${docType}.pdf`);
         }
 
@@ -939,10 +982,8 @@
             const snapshot = await db.collection('sales').orderBy('createdAt', 'desc').get();
             sales = [];
             snapshot.forEach(doc => sales.push({ id: doc.id, ...doc.data() }));
-            
             const tbody = document.getElementById('salesTable');
             tbody.innerHTML = '';
-            
             sales.forEach(sale => {
                 const date = sale.createdAt?.toDate().toLocaleDateString('bn-BD') || 'N/A';
                 const tr = document.createElement('tr');
@@ -953,19 +994,14 @@
                     <td>${sale.items.map(i => `${i.name} (x${i.qty})`).join('<br>')}</td>
                     <td class="fw-bold text-success">৳${sale.total}</td>
                     <td><span class="badge bg-info">${sale.soldBy}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewInvoice('${sale.id}')">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    </td>
+                    <td><button class="btn btn-sm btn-primary" onclick="viewInvoice('${sale.id}')"><i class="fa-solid fa-eye"></i></button></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
         async function viewInvoice(saleId) {
-            const sale = sales.find(s => s.id === saleId);
-            currentInvoice = sale;
+            currentInvoice = sales.find(s => s.id === saleId);
             generateInvoice();
             switchDocType('invoice');
             new bootstrap.Modal(document.getElementById('invoiceModal')).show();
@@ -974,25 +1010,13 @@
         function exportSalesPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
             doc.setFontSize(18);
             doc.text('Sales Report', 105, 15, { align: 'center' });
-            
             const tableData = sales.map(sale => [
                 sale.createdAt?.toDate().toLocaleDateString('bn-BD') || 'N/A',
-                sale.invoiceNo,
-                sale.customer,
-                sale.items.map(i => i.name).join(', '),
-                `৳${sale.total}`,
-                sale.soldBy
+                sale.invoiceNo, sale.customer, sale.items.map(i => i.name).join(', '), `৳${sale.total}`, sale.soldBy
             ]);
-            
-            doc.autoTable({
-                startY: 25,
-                head: [['Date', 'Invoice', 'Customer', 'Items', 'Total', 'Sold By']],
-                body: tableData,
-            });
-            
+            doc.autoTable({ startY: 25, head: [['Date', 'Invoice', 'Customer', 'Items', 'Total', 'Sold By']], body: tableData });
             doc.save('sales_report.pdf');
         }
 
@@ -1000,7 +1024,6 @@
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = JSON.parse(localStorage.getItem('user'));
-            
             await db.collection('products').add({
                 sku: document.getElementById('pSku').value,
                 name: document.getElementById('pName').value,
@@ -1010,16 +1033,13 @@
                 addedBy: user.name,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            
             bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
             e.target.reset();
             await loadProducts();
         });
 
         document.getElementById('searchProduct').addEventListener('input', renderProducts);
-
-        // Check auth state
         auth.onAuthStateChanged(() => loadApp());
     </script>
 </body>
-    </html>
+</html>
