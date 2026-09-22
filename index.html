@@ -22,49 +22,70 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --bg-secondary: rgba(255,255,255,0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --card-bg: rgba(255,255,255,0.95);
+            --card-shadow: 0 3px 15px rgba(0,0,0,0.2);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            --bg-secondary: rgba(30,30,30,0.8);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(40,40,40,0.95);
+            --card-shadow: 0 3px 15px rgba(0,0,0,0.5);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: var(--bg-primary);
             min-height: 100vh;
+            color: var(--text-primary);
             transition: all 0.3s;
-        }
-
-        body.dark-mode {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-            color: #e0e0e0;
-        }
-
-        body.dark-mode .product-card,
-        body.dark-mode .chart-container,
-        body.dark-mode .card {
-            background: #2d2d2d;
-            color: #e0e0e0;
-        }
-
-        body.dark-mode .invoice-box {
-            background: white;
-            color: black;
         }
 
         .header-3d {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 30px;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3), inset 0 2px 10px rgba(255,255,255,0.3);
             border-radius: 0 0 30px 30px;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
         }
 
+        .header-3d::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
         .header-3d h1 {
             color: white;
             font-size: 2.5rem;
             font-weight: 700;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.5);
             margin: 0;
+            position: relative;
+            z-index: 1;
             letter-spacing: 2px;
         }
 
@@ -72,6 +93,8 @@
             color: rgba(255,255,255,0.9);
             margin-top: 10px;
             font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
         }
 
         .login-container {
@@ -102,18 +125,18 @@
         }
 
         .product-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            box-shadow: var(--card-shadow);
             border-left: 4px solid #667eea;
             transition: transform 0.2s;
+            color: #333;
         }
 
         .product-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
         }
 
         .product-card h6 {
@@ -121,10 +144,6 @@
             font-weight: 700;
             margin-bottom: 8px;
             font-size: 0.95rem;
-        }
-
-        body.dark-mode .product-card h6 {
-            color: #e0e0e0;
         }
 
         .product-sku {
@@ -202,41 +221,49 @@
             font-weight: bold;
         }
 
+        /* A4 Invoice Box */
         .invoice-box {
             background: white;
-            padding: 40px;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 0 auto;
             font-family: 'Times New Roman', Times, serif;
-            font-size: 14px;
+            font-size: 12pt;
             color: #000;
             line-height: 1.6;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         .invoice-table th, .invoice-table td {
             border: 1px solid #000;
-            padding: 8px;
+            padding: 6px 8px;
         }
 
         .invoice-table th {
             text-align: center;
             background: #f8f9fa;
+            font-weight: bold;
         }
 
         .editable-field {
-            border: none !important;
-            background: transparent !important;
-            display: inline !important;
-            padding: 0 !important;
+            border: 1px dashed #aaa !important;
+            background: #fdfdfd !important;
+            display: inline-block !important;
+            padding: 2px 8px !important;
             font-family: 'Times New Roman', Times, serif !important;
-            font-size: 14px !important;
+            font-size: 12pt !important;
             width: auto !important;
+            min-width: 150px;
         }
 
         .chart-container {
-            background: white;
+            background: var(--card-bg);
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 20px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            box-shadow: var(--card-shadow);
+            color: #333;
             position: relative;
             height: 300px;
         }
@@ -259,57 +286,73 @@
                 position: absolute; 
                 left: 0; 
                 top: 0; 
-                width: 100%; 
-                padding: 20px;
+                width: 210mm;
+                height: 297mm;
+                padding: 15mm;
                 background: white;
+                box-shadow: none;
             }
             .no-print { display: none !important; }
+            @page {
+                size: A4;
+                margin: 0;
+            }
         }
 
         .tab-content {
-            background: rgba(255,255,255,0.1);
+            background: var(--bg-secondary);
             padding: 25px;
             border-radius: 15px;
         }
 
-        .btn-custom {
-            border-radius: 8px;
-            padding: 8px 20px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .alert-low-stock {
+        .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 9998;
-            animation: slideIn 0.5s;
+            z-index: 9999;
+            min-width: 300px;
+        }
+
+        .low-stock-alert {
+            background: #dc3545;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s;
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
         }
 
-        .theme-toggle, .lang-toggle {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 5px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-        }
-
-        #barcodeReader {
+        .barcode-scanner {
             width: 100%;
             max-width: 500px;
-            margin: 20px auto;
+            margin: 0 auto;
         }
 
-        .customer-history {
-            max-height: 400px;
-            overflow-y: auto;
+        #reader {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .modal-dialog.modal-lg-custom {
+            max-width: 900px;
         }
     </style>
 </head>
@@ -320,13 +363,13 @@
         <div class="spinner-border text-light" style="width: 3rem; height: 3rem;"></div>
     </div>
 
-    <!-- Low Stock Alert -->
-    <div id="lowStockAlert"></div>
+    <!-- Notifications -->
+    <div class="notification" id="notificationArea"></div>
 
     <!-- 3D Header -->
     <div class="header-3d">
         <h1><i class="fa-solid fa-microchip me-3"></i>AMIN COMPUTER</h1>
-        <p data-lang="tagline">Store Management & POS System</p>
+        <p>Store Management & POS System</p>
     </div>
 
     <!-- LOGIN PAGE -->
@@ -334,7 +377,7 @@
         <div class="login-box">
             <div class="text-center mb-4">
                 <i class="fa-solid fa-user-lock fa-4x text-primary"></i>
-                <h3 class="mt-3" data-lang="login">লগইন করুন</h3>
+                <h3 class="mt-3">লগইন করুন</h3>
             </div>
             <div id="loginForm">
                 <div class="mb-3">
@@ -343,7 +386,7 @@
                 <div class="mb-3">
                     <input type="password" id="loginPassword" class="form-control form-control-lg" placeholder="পাসওয়ার্ড">
                 </div>
-                <button class="btn btn-primary w-100 btn-lg" onclick="loginUser()" data-lang="loginBtn">লগইন</button>
+                <button class="btn btn-primary w-100 btn-lg" onclick="loginUser()">লগইন</button>
             </div>
         </div>
     </div>
@@ -354,12 +397,9 @@
         <nav class="navbar navbar-dark navbar-custom">
             <div class="container-fluid">
                 <span class="navbar-brand fs-5"><i class="fa-solid fa-store me-2"></i>Amin Computer</span>
-                <div class="d-flex align-items-center gap-2">
-                    <button class="theme-toggle" onclick="toggleTheme()">
-                        <i class="fa-solid fa-moon"></i>
-                    </button>
-                    <button class="lang-toggle" onclick="toggleLanguage()">
-                        <i class="fa-solid fa-language"></i> EN/বাং
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-sm btn-light" onclick="openBarcodeScanner()" title="বারকোড স্ক্যান">
+                        <i class="fa-solid fa-barcode"></i>
                     </button>
                     <span class="text-white">
                         <i class="fa-solid fa-user me-1"></i>
@@ -367,10 +407,10 @@
                         <span class="badge bg-warning text-dark ms-2" id="userRole"></span>
                     </span>
                     <button class="btn btn-warning position-relative" onclick="openCart()">
-                        <i class="fa-solid fa-cart-shopping me-1"></i><span data-lang="cart">Cart</span>
+                        <i class="fa-solid fa-cart-shopping me-1"></i>Cart
                         <span class="cart-badge" id="cartCount">0</span>
                     </button>
-                    <button class="btn btn-light btn-sm" onclick="logout()" data-lang="logout">লগআউট</button>
+                    <button class="btn btn-light btn-sm" onclick="logout()">লগআউট</button>
                 </div>
             </div>
         </nav>
@@ -398,7 +438,7 @@
                         <i class="fa-solid fa-users me-2"></i><span data-lang="customers">কাস্টমার</span>
                     </button>
                 </li>
-                <li class="nav-item" id="navReports">
+                <li class="nav-item">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reports">
                         <i class="fa-solid fa-file-alt me-2"></i><span data-lang="reports">রিপোর্ট</span>
                     </button>
@@ -411,18 +451,18 @@
             </ul>
 
             <div class="tab-content">
-                <!-- Dashboard Tab with Charts -->
+                <!-- Dashboard Tab -->
                 <div class="tab-pane fade show active" id="dashboard">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="chart-container">
-                                <h5 class="mb-3"><i class="fa-solid fa-box me-2"></i><span data-lang="stockStatus">স্টক অবস্থা</span></h5>
+                                <h5 class="mb-3"><i class="fa-solid fa-box me-2"></i><span data-lang="stock_status">স্টক অবস্থা</span></h5>
                                 <canvas id="stockChart"></canvas>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="chart-container">
-                                <h5 class="mb-3"><i class="fa-solid fa-chart-bar me-2"></i><span data-lang="salesAnalysis">বিক্রয় বিশ্লেষণ</span></h5>
+                                <h5 class="mb-3"><i class="fa-solid fa-chart-pie me-2"></i><span data-lang="sales_analysis">বিক্রয় বিশ্লেষণ</span></h5>
                                 <canvas id="salesChart"></canvas>
                             </div>
                         </div>
@@ -430,7 +470,7 @@
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <div class="chart-container">
-                                <h5 class="mb-3"><i class="fa-solid fa-calendar-alt me-2"></i><span data-lang="salesTrend">বিক্রয় ট্রেন্ড (৩০ দিন)</span></h5>
+                                <h5 class="mb-3"><i class="fa-solid fa-calendar-alt me-2"></i><span data-lang="sales_trend">বিক্রয় ট্রেন্ড (৩০ দিন)</span></h5>
                                 <canvas id="salesTrendChart"></canvas>
                             </div>
                         </div>
@@ -438,7 +478,7 @@
                     <div class="row mt-3" id="profitLossSection">
                         <div class="col-md-12">
                             <div class="chart-container">
-                                <h5 class="mb-3"><i class="fa-solid fa-money-bill-trend-up me-2"></i><span data-lang="profitLoss">লাভ/ক্ষতি রিপোর্ট</span></h5>
+                                <h5 class="mb-3"><i class="fa-solid fa-chart-line me-2"></i><span data-lang="profit_loss">লাভ/ক্ষতি রিপোর্ট</span></h5>
                                 <canvas id="profitLossChart"></canvas>
                             </div>
                         </div>
@@ -448,17 +488,12 @@
                 <!-- Products Tab -->
                 <div class="tab-pane fade" id="products">
                     <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" id="searchProduct" class="form-control form-control-lg" placeholder="🔍 প্রোডাক্ট সার্চ (নাম/SKU/Serial/Barcode)...">
+                        <div class="col-md-8">
+                            <input type="text" id="searchProduct" class="form-control form-control-lg" placeholder="🔍 প্রোডাক্ট সার্চ (নাম/SKU/Serial Number)...">
                         </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-info w-100" onclick="startBarcodeScanner()">
-                                <i class="fa-solid fa-barcode me-2"></i><span data-lang="scanBarcode">বারকোড স্ক্যান</span>
-                            </button>
-                        </div>
-                        <div class="col-md-3 text-end">
+                        <div class="col-md-4 text-end">
                             <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addProductModal" id="btnAddProduct">
-                                <i class="fa-solid fa-plus me-1"></i><span data-lang="newProduct">নতুন প্রোডাক্ট</span>
+                                <i class="fa-solid fa-plus me-1"></i><span data-lang="new_product">নতুন প্রোডাক্ট</span>
                             </button>
                         </div>
                     </div>
@@ -469,9 +504,9 @@
                 <div class="tab-pane fade" id="sales">
                     <div class="card border-0 shadow">
                         <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-                            <h5 class="mb-0"><i class="fa-solid fa-receipt me-2"></i><span data-lang="salesRecord">সেলস রেকর্ড</span></h5>
+                            <h5 class="mb-0"><i class="fa-solid fa-receipt me-2"></i><span data-lang="sales_record">সেলস রেকর্ড</span></h5>
                             <button class="btn btn-light btn-sm" onclick="exportSalesPDF()">
-                                <i class="fa-solid fa-file-pdf me-1"></i>PDF
+                                <i class="fa-solid fa-file-pdf me-1"></i>PDF ডাউনলোড
                             </button>
                         </div>
                         <div class="card-body">
@@ -479,13 +514,13 @@
                                 <table class="table table-hover">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th data-lang="date">তারিখ</th>
-                                            <th data-lang="invoiceNo">ইনভয়েস নং</th>
-                                            <th data-lang="customer">কাস্টমার</th>
-                                            <th data-lang="items">আইটেম</th>
-                                            <th data-lang="total">টোটাল</th>
-                                            <th data-lang="seller">বিক্রেতা</th>
-                                            <th data-lang="action">অ্যাকশন</th>
+                                            <th><span data-lang="date">তারিখ</span></th>
+                                            <th><span data-lang="invoice_no">ইনভয়েস নং</span></th>
+                                            <th><span data-lang="customer">কাস্টমার</span></th>
+                                            <th><span data-lang="items">আইটেম</span></th>
+                                            <th><span data-lang="total">টোটাল</span></th>
+                                            <th><span data-lang="seller">বিক্রেতা</span></th>
+                                            <th><span data-lang="action">অ্যাকশন</span></th>
                                         </tr>
                                     </thead>
                                     <tbody id="salesTable"></tbody>
@@ -499,19 +534,18 @@
                 <div class="tab-pane fade" id="customers">
                     <div class="card border-0 shadow">
                         <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0"><i class="fa-solid fa-users me-2"></i><span data-lang="customerDatabase">কাস্টমার ডাটাবেস</span></h5>
+                            <h5 class="mb-0"><i class="fa-solid fa-users me-2"></i><span data-lang="customer_database">কাস্টমার ডাটাবেস</span></h5>
                         </div>
                         <div class="card-body">
-                            <input type="text" id="searchCustomer" class="form-control mb-3" placeholder="কাস্টমারের নাম বা ফোন নম্বর দিয়ে সার্চ করুন...">
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th data-lang="name">নাম</th>
-                                            <th data-lang="phone">ফোন</th>
-                                            <th data-lang="totalPurchases">মোট কেনাকাটা</th>
-                                            <th data-lang="lastPurchase">সর্বশেষ কেনাকাটা</th>
-                                            <th data-lang="action">অ্যাকশন</th>
+                                            <th><span data-lang="name">নাম</span></th>
+                                            <th><span data-lang="phone">ফোন</span></th>
+                                            <th><span data-lang="total_purchases">মোট কেনাকাটা</span></th>
+                                            <th><span data-lang="last_purchase">শেষ কেনাকাটা</span></th>
+                                            <th><span data-lang="action">অ্যাকশন</span></th>
                                         </tr>
                                     </thead>
                                     <tbody id="customersTable"></tbody>
@@ -524,41 +558,31 @@
                 <!-- Reports Tab -->
                 <div class="tab-pane fade" id="reports">
                     <div class="row mb-4">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="card border-0 shadow">
                                 <div class="card-body">
-                                    <h6><i class="fa-solid fa-filter me-2"></i><span data-lang="byDate">তারিখ অনুযায়ী</span></h6>
+                                    <h6><i class="fa-solid fa-filter me-2"></i><span data-lang="by_date">তারিখ অনুযায়ী</span></h6>
                                     <input type="date" id="reportStartDate" class="form-control mb-2">
                                     <input type="date" id="reportEndDate" class="form-control mb-2">
-                                    <button class="btn btn-primary w-100" onclick="generateDateReport()"><span data-lang="viewReport">রিপোর্ট দেখুন</span></button>
+                                    <button class="btn btn-primary w-100" onclick="generateDateReport()"><span data-lang="show_report">রিপোর্ট দেখুন</span></button>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="card border-0 shadow">
                                 <div class="card-body">
-                                    <h6><i class="fa-solid fa-user me-2"></i><span data-lang="byUser">ইউজার অনুযায়ী</span></h6>
+                                    <h6><i class="fa-solid fa-user me-2"></i><span data-lang="by_user">ইউজার অনুযায়ী</span></h6>
                                     <select id="reportUser" class="form-select mb-2"></select>
-                                    <button class="btn btn-success w-100" onclick="generateUserReport()"><span data-lang="viewReport">রিপোর্ট দেখুন</span></button>
+                                    <button class="btn btn-success w-100" onclick="generateUserReport()"><span data-lang="show_report">রিপোর্ট দেখুন</span></button>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="card border-0 shadow">
                                 <div class="card-body">
-                                    <h6><i class="fa-solid fa-barcode me-2"></i><span data-lang="bySerial">সিরিয়াল নম্বর</span></h6>
-                                    <input type="text" id="searchSN" class="form-control mb-2" placeholder="Serial Number">
+                                    <h6><i class="fa-solid fa-barcode me-2"></i><span data-lang="serial_number">সিরিয়াল নম্বর</span></h6>
+                                    <input type="text" id="searchSN" class="form-control mb-2" placeholder="Serial Number দিন">
                                     <button class="btn btn-info w-100 text-white" onclick="searchBySN()"><span data-lang="search">খুঁজুন</span></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card border-0 shadow">
-                                <div class="card-body">
-                                    <h6><i class="fa-solid fa-database me-2"></i><span data-lang="backupRestore">ব্যাকআপ/রিস্টোর</span></h6>
-                                    <button class="btn btn-warning w-100 mb-2" onclick="backupData()"><i class="fa-solid fa-download me-1"></i><span data-lang="backup">ব্যাকআপ</span></button>
-                                    <button class="btn btn-secondary w-100" onclick="document.getElementById('restoreFile').click()"><i class="fa-solid fa-upload me-1"></i><span data-lang="restore">রিস্টোর</span></button>
-                                    <input type="file" id="restoreFile" style="display:none" accept=".json" onchange="restoreData(event)">
                                 </div>
                             </div>
                         </div>
@@ -570,23 +594,23 @@
                 <div class="tab-pane fade" id="userManagement">
                     <div class="card border-0 shadow">
                         <div class="card-header d-flex justify-content-between align-items-center bg-light">
-                            <h5 class="mb-0"><i class="fa-solid fa-users-gear me-2"></i><span data-lang="userManagement">ইউজার ম্যানেজমেন্ট</span></h5>
+                            <h5 class="mb-0"><i class="fa-solid fa-users-gear me-2"></i><span data-lang="user_management">ইউজার ম্যানেজমেন্ট</span></h5>
                             <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                                <i class="fa-solid fa-user-plus me-1"></i><span data-lang="newUser">নতুন ইউজার</span>
+                                <i class="fa-solid fa-user-plus me-1"></i><span data-lang="new_user">নতুন ইউজার</span>
                             </button>
                         </div>
                         <div class="card-body">
                             <div class="alert alert-warning">
                                 <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                                <span data-lang="userNote">নতুন ইউজার তৈরি করলে অটোমেটিক লগআউট হয়ে যাবে। আবার লগইন করুন।</span>
+                                <span data-lang="user_note">নোট: নতুন ইউজার তৈরি করলে অটোমেটিক লগআউট হয়ে যাবে। আবার লগইন করুন।</span>
                             </div>
                             <table class="table table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th data-lang="name">নাম</th>
-                                        <th data-lang="email">ইমেইল</th>
-                                        <th data-lang="role">রোল</th>
-                                        <th data-lang="action">অ্যাকশন</th>
+                                        <th><span data-lang="name">নাম</span></th>
+                                        <th><span data-lang="email">ইমেইল</span></th>
+                                        <th><span data-lang="role">রোল</span></th>
+                                        <th><span data-lang="action">অ্যাকশন</span></th>
                                     </tr>
                                 </thead>
                                 <tbody id="usersTableBody"></tbody>
@@ -603,7 +627,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-warning">
-                    <h5 class="modal-title"><i class="fa-solid fa-cart-shopping me-2"></i><span data-lang="sellMultiple">একসাথে একাধিক প্রোডাক্ট বিক্রয়</span></h5>
+                    <h5 class="modal-title"><i class="fa-solid fa-cart-shopping me-2"></i><span data-lang="sell_multiple">একসাথে একাধিক প্রোডাক্ট বিক্রয়</span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -611,32 +635,32 @@
                         <table class="table table-bordered">
                             <thead class="table-light">
                                 <tr>
-                                    <th data-lang="product">প্রোডাক্ট</th>
-                                    <th data-lang="price">দাম</th>
-                                    <th data-lang="quantity">পরিমাণ</th>
-                                    <th data-lang="total">মোট</th>
-                                    <th data-lang="delete">মুছুন</th>
+                                    <th><span data-lang="product">প্রোডাক্ট</span></th>
+                                    <th><span data-lang="price">দাম</span></th>
+                                    <th><span data-lang="quantity">পরিমাণ</span></th>
+                                    <th><span data-lang="total">মোট</span></th>
+                                    <th><span data-lang="delete">মুছুন</span></th>
                                 </tr>
                             </thead>
                             <tbody id="cartTable"></tbody>
                         </table>
                     </div>
                     <div class="text-end mb-3">
-                        <h4><span data-lang="totalBill">সর্বমোট বিল</span>: ৳ <span id="cartTotal">0</span></h4>
+                        <h4><span data-lang="total_bill">সর্বমোট বিল</span>: ৳ <span id="cartTotal">0</span></h4>
                     </div>
                     <hr>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold" data-lang="customerName">কাস্টমারের নাম</label>
+                            <label class="form-label fw-bold"><span data-lang="customer_name">কাস্টমারের নাম</span></label>
                             <input type="text" id="custName" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold" data-lang="mobileNumber">মোবাইল নম্বর</label>
+                            <label class="form-label fw-bold"><span data-lang="mobile_number">মোবাইল নম্বর</span></label>
                             <input type="tel" id="custPhone" class="form-control" required>
                         </div>
                     </div>
                     <button class="btn btn-success w-100 btn-lg" onclick="confirmSale()">
-                        <i class="fa-solid fa-check me-2"></i><span data-lang="confirmSale">বিক্রয় নিশ্চিত করুন ও ইনভয়েস তৈরি করুন</span>
+                        <i class="fa-solid fa-check me-2"></i><span data-lang="confirm_sale">বিক্রয় নিশ্চিত করুন ও ইনভয়েস তৈরি করুন</span>
                     </button>
                 </div>
             </div>
@@ -645,21 +669,22 @@
 
     <!-- INVOICE/CHALAN MODAL -->
     <div class="modal fade" id="invoiceModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-lg-custom">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" data-lang="printPreview">প্রিন্ট প্রিভিউ (A4 Size)</h5>
+                    <h5 class="modal-title"><span data-lang="print_preview">প্রিন্ট প্রিভিউ (A4 Size)</span></h5>
                     <div class="ms-auto">
                         <button class="btn btn-primary btn-sm me-2" id="btnInvoice" onclick="switchDocType('invoice')">INVOICE</button>
                         <button class="btn btn-info btn-sm text-white" id="btnChalan" onclick="switchDocType('chalan')">DELIVERY CHALAN</button>
                     </div>
                     <button type="button" class="btn-close ms-2" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-0">
+                <div class="modal-body p-0" style="background: #f0f0f0; padding: 20px;">
                     <div id="printArea" class="invoice-box">
-                        <div style="height: 1.6in;"></div>
                         <div class="text-center mb-4">
                             <h2 class="text-decoration-underline" id="docTitle">INVOICE/BILL</h2>
+                            <p class="mb-0">Amin Computer</p>
+                            <p class="mb-0" style="font-size: 10pt;">Cell: +880175911108 | E-mail: amintechnology16@gmail.com</p>
                         </div>
                         <div class="row mb-3">
                             <div class="col-6">
@@ -682,10 +707,10 @@
                             <table class="table invoice-table w-100">
                                 <thead>
                                     <tr>
-                                        <th style="width: 10%">SL</th>
-                                        <th style="width: 40%">Description</th>
-                                        <th style="width: 15%">Qty</th>
-                                        <th style="width: 15%">Unit Price</th>
+                                        <th style="width: 8%">SL</th>
+                                        <th style="width: 42%">Description</th>
+                                        <th style="width: 12%">Qty</th>
+                                        <th style="width: 18%">Unit Price</th>
                                         <th style="width: 20%">Total</th>
                                     </tr>
                                 </thead>
@@ -723,40 +748,22 @@
                             </button>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="mt-4" style="margin-top: 50px;">
                             <p>Thanking you and assuring you our best services at all times</p>
                             <p>Sincerely yours,</p>
                             <p class="mt-4"><strong>Md. Nacher Uddin Reaz</strong></p>
                             <p>Proprietor of Amin Computer</p>
-                            <p>Cell: +880175911108</p>
-                            <p>E-mail: amintechnology16@gmail.com</p>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal" data-lang="close">বন্ধ</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal"><span data-lang="close">বন্ধ</span></button>
                     <button class="btn btn-primary" onclick="printInvoice()">
                         <i class="fa-solid fa-print me-1"></i><span data-lang="print">প্রিন্ট</span>
                     </button>
                     <button class="btn btn-success" onclick="downloadPDF()">
-                        <i class="fa-solid fa-download me-1"></i>PDF
+                        <i class="fa-solid fa-download me-1"></i>PDF ডাউনলোড
                     </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- BARCODE SCANNER MODAL -->
-    <div class="modal fade" id="barcodeModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title"><i class="fa-solid fa-barcode me-2"></i>বারকোড স্ক্যানার</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopBarcodeScanner()"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <div id="barcodeReader"></div>
-                    <p class="mt-3 text-muted">প্রোডাক্টের বারকোড ক্যামেরায় দেখান</p>
                 </div>
             </div>
         </div>
@@ -767,7 +774,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" data-lang="newProduct">নতুন প্রোডাক্ট</h5>
+                    <h5 class="modal-title"><span data-lang="new_product">নতুন প্রোডাক্ট</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -785,29 +792,49 @@
                             <input type="text" id="pBarcode" class="form-control" placeholder="বারকোড নম্বর (ঐচ্ছিক)">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" data-lang="productName">Product Name</label>
+                            <label class="form-label">Product Name</label>
                             <input type="text" id="pName" class="form-control" required>
                         </div>
                         <div class="row">
                             <div class="col-6 mb-3">
-                                <label class="form-label" data-lang="buyPrice">Buy Price</label>
+                                <label class="form-label">Buy Price</label>
                                 <input type="number" id="pBuy" class="form-control" required>
                             </div>
                             <div class="col-6 mb-3">
-                                <label class="form-label" data-lang="sellPrice">Sell Price</label>
+                                <label class="form-label">Sell Price</label>
                                 <input type="number" id="pSell" class="form-control" required>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" data-lang="quantity">Quantity</label>
+                            <label class="form-label">Quantity</label>
                             <input type="number" id="pQty" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" data-lang="warranty">Warranty (মাসে)</label>
+                            <label class="form-label">Warranty (মাসে)</label>
                             <input type="number" id="pWarranty" class="form-control" placeholder="যেমন: 12 (১২ মাস)">
                         </div>
-                        <button type="submit" class="btn btn-primary w-100" data-lang="save">সেভ করুন</button>
+                        <button type="submit" class="btn btn-primary w-100"><span data-lang="save">সেভ করুন</span></button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BARCODE SCANNER MODAL -->
+    <div class="modal fade" id="barcodeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-barcode me-2"></i>বারকোড স্ক্যানার</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopBarcodeScanner()"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="reader" class="barcode-scanner"></div>
+                    <div class="mt-3">
+                        <label class="form-label">ম্যানুয়ালি বারকোড নম্বর দিন:</label>
+                        <input type="text" id="manualBarcode" class="form-control" placeholder="বারকোড নম্বর">
+                        <button class="btn btn-primary w-100 mt-2" onclick="searchByBarcode()">খুঁজুন</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -818,31 +845,31 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" data-lang="newUser">নতুন ইউজার</h5>
+                    <h5 class="modal-title"><span data-lang="new_user">নতুন ইউজার</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="createUserForm">
                         <div class="mb-3">
-                            <label class="form-label" data-lang="name">নাম</label>
+                            <label class="form-label"><span data-lang="name">নাম</span></label>
                             <input type="text" id="newUserName" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" data-lang="email">ইমেইল</label>
+                            <label class="form-label"><span data-lang="email">ইমেইল</span></label>
                             <input type="email" id="newUserEmail" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" data-lang="password">পাসওয়ার্ড</label>
+                            <label class="form-label"><span data-lang="password">পাসওয়ার্ড</span></label>
                             <input type="password" id="newUserPassword" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" data-lang="role">রোল</label>
+                            <label class="form-label"><span data-lang="role">রোল</span></label>
                             <select id="newUserRole" class="form-select">
                                 <option value="user">User (কর্মী)</option>
                                 <option value="admin">Admin (মালিক)</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100" data-lang="create">তৈরি করুন</button>
+                        <button type="submit" class="btn btn-primary w-100"><span data-lang="create">তৈরি করুন</span></button>
                     </form>
                 </div>
             </div>
@@ -853,48 +880,43 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-warning">
-                    <h5 class="modal-title" data-lang="editUser">ইউজার এডিট</h5>
+                    <h5 class="modal-title"><span data-lang="edit_user">ইউজার এডিট</span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editUserForm">
                         <input type="hidden" id="editUserUid">
                         <div class="mb-3">
-                            <label class="form-label" data-lang="name">নাম</label>
+                            <label class="form-label"><span data-lang="name">নাম</span></label>
                             <input type="text" id="editUserName" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" data-lang="email">ইমেইল</label>
+                            <label class="form-label"><span data-lang="email">ইমেইল</span></label>
                             <input type="email" id="editUserEmail" class="form-control" readonly>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" data-lang="role">রোল</label>
+                            <label class="form-label"><span data-lang="role">রোল</span></label>
                             <select id="editUserRole" class="form-select">
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-warning w-100" data-lang="update">আপডেট</button>
+                        <button type="submit" class="btn btn-warning w-100"><span data-lang="update">আপডেট</span></button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- CUSTOMER HISTORY MODAL -->
-    <div class="modal fade" id="customerHistoryModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fa-solid fa-history me-2"></i>কাস্টমারের ক্রয় ইতিহাস</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="customerHistoryContent" class="customer-history"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Theme Toggle -->
+    <button class="btn btn-dark theme-toggle" onclick="toggleTheme()" title="ডার্ক মোড">
+        <i class="fa-solid fa-moon"></i>
+    </button>
+
+    <!-- Language Toggle -->
+    <button class="btn btn-primary lang-toggle" onclick="toggleLanguage()" title="ভাষা পরিবর্তন">
+        <i class="fa-solid fa-language"></i> <span id="langLabel">EN</span>
+    </button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -929,136 +951,133 @@
         // Translations
         const translations = {
             bn: {
-                tagline: 'Store Management & POS System',
-                login: 'লগইন করুন',
-                loginBtn: 'লগইন',
-                cart: 'Cart',
-                logout: 'লগআউট',
                 dashboard: 'ড্যাশবোর্ড',
                 products: 'প্রোডাক্টস',
                 sales: 'সেলস',
                 customers: 'কাস্টমার',
                 reports: 'রিপোর্ট',
                 users: 'ইউজার',
-                stockStatus: 'স্টক অবস্থা',
-                salesAnalysis: 'বিক্রয় বিশ্লেষণ',
-                salesTrend: 'বিক্রয় ট্রেন্ড (৩০ দিন)',
-                profitLoss: 'লাভ/ক্ষতি রিপোর্ট',
-                scanBarcode: 'বারকোড স্ক্যান',
-                newProduct: 'নতুন প্রোডাক্ট',
-                salesRecord: 'সেলস রেকর্ড',
-                customerDatabase: 'কাস্টমার ডাটাবেস',
-                byDate: 'তারিখ অনুযায়ী',
-                byUser: 'ইউজার অনুযায়ী',
-                bySerial: 'সিরিয়াল নম্বর',
-                backupRestore: 'ব্যাকআপ/রিস্টোর',
-                backup: 'ব্যাকআপ',
-                restore: 'রিস্টোর',
-                viewReport: 'রিপোর্ট দেখুন',
+                stock_status: 'স্টক অবস্থা',
+                sales_analysis: 'বিক্রয় বিশ্লেষণ',
+                sales_trend: 'বিক্রয় ট্রেন্ড (৩০ দিন)',
+                profit_loss: 'লাভ/ক্ষতি রিপোর্ট',
+                new_product: 'নতুন প্রোডাক্ট',
+                sales_record: 'সেলস রেকর্ড',
+                customer_database: 'কাস্টমার ডাটাবেস',
+                by_date: 'তারিখ অনুযায়ী',
+                by_user: 'ইউজার অনুযায়ী',
+                serial_number: 'সিরিয়াল নম্বর',
+                show_report: 'রিপোর্ট দেখুন',
                 search: 'খুঁজুন',
-                userManagement: 'ইউজার ম্যানেজমেন্ট',
-                newUser: 'নতুন ইউজার',
-                userNote: 'নতুন ইউজার তৈরি করলে অটোমেটিক লগআউট হয়ে যাবে। আবার লগইন করুন।',
-                sellMultiple: 'একসাথে একাধিক প্রোডাক্ট বিক্রয়',
+                user_management: 'ইউজার ম্যানেজমেন্ট',
+                new_user: 'নতুন ইউজার',
+                user_note: 'নোট: নতুন ইউজার তৈরি করলে অটোমেটিক লগআউট হয়ে যাবে। আবার লগইন করুন।',
+                name: 'নাম',
+                phone: 'ফোন',
+                total_purchases: 'মোট কেনাকাটা',
+                last_purchase: 'শেষ কেনাকাটা',
+                action: 'অ্যাকশন',
+                email: 'ইমেইল',
+                role: 'রোল',
+                sell_multiple: 'একসাথে একাধিক প্রোডাক্ট বিক্রয়',
                 product: 'প্রোডাক্ট',
                 price: 'দাম',
                 quantity: 'পরিমাণ',
                 total: 'মোট',
                 delete: 'মুছুন',
-                totalBill: 'সর্বমোট বিল',
-                customerName: 'কাস্টমারের নাম',
-                mobileNumber: 'মোবাইল নম্বর',
-                confirmSale: 'বিক্রয় নিশ্চিত করুন ও ইনভয়েস তৈরি করুন',
-                printPreview: 'প্রিন্ট প্রিভিউ (A4 Size)',
+                total_bill: 'সর্বমোট বিল',
+                customer_name: 'কাস্টমারের নাম',
+                mobile_number: 'মোবাইল নম্বর',
+                confirm_sale: 'বিক্রয় নিশ্চিত করুন ও ইনভয়েস তৈরি করুন',
+                print_preview: 'প্রিন্ট প্রিভিউ (A4 Size)',
                 close: 'বন্ধ',
                 print: 'প্রিন্ট',
+                save: 'সেভ করুন',
+                create: 'তৈরি করুন',
+                edit_user: 'ইউজার এডিট',
+                update: 'আপডেট',
+                password: 'পাসওয়ার্ড',
                 date: 'তারিখ',
-                invoiceNo: 'ইনভয়েস নং',
+                invoice_no: 'ইনভয়েস নং',
                 customer: 'কাস্টমার',
                 items: 'আইটেম',
-                seller: 'বিক্রেতা',
-                action: 'অ্যাকশন',
-                name: 'নাম',
-                phone: 'ফোন',
-                totalPurchases: 'মোট কেনাকাটা',
-                lastPurchase: 'সর্বশেষ কেনাকাটা',
-                email: 'ইমেইল',
-                role: 'রোল',
-                editUser: 'ইউজার এডিট',
-                update: 'আপডেট',
-                create: 'তৈরি করুন',
-                save: 'সেভ করুন',
-                productName: 'Product Name',
-                buyPrice: 'Buy Price',
-                sellPrice: 'Sell Price',
-                warranty: 'Warranty (মাসে)'
+                seller: 'বিক্রেতা'
             },
             en: {
-                tagline: 'Store Management & POS System',
-                login: 'Login',
-                loginBtn: 'Login',
-                cart: 'Cart',
-                logout: 'Logout',
                 dashboard: 'Dashboard',
                 products: 'Products',
                 sales: 'Sales',
                 customers: 'Customers',
                 reports: 'Reports',
                 users: 'Users',
-                stockStatus: 'Stock Status',
-                salesAnalysis: 'Sales Analysis',
-                salesTrend: 'Sales Trend (30 days)',
-                profitLoss: 'Profit/Loss Report',
-                scanBarcode: 'Scan Barcode',
-                newProduct: 'New Product',
-                salesRecord: 'Sales Record',
-                customerDatabase: 'Customer Database',
-                byDate: 'By Date',
-                byUser: 'By User',
-                bySerial: 'By Serial',
-                backupRestore: 'Backup/Restore',
-                backup: 'Backup',
-                restore: 'Restore',
-                viewReport: 'View Report',
+                stock_status: 'Stock Status',
+                sales_analysis: 'Sales Analysis',
+                sales_trend: 'Sales Trend (30 days)',
+                profit_loss: 'Profit/Loss Report',
+                new_product: 'New Product',
+                sales_record: 'Sales Record',
+                customer_database: 'Customer Database',
+                by_date: 'By Date',
+                by_user: 'By User',
+                serial_number: 'Serial Number',
+                show_report: 'Show Report',
                 search: 'Search',
-                userManagement: 'User Management',
-                newUser: 'New User',
-                userNote: 'Creating a new user will automatically log you out. Please login again.',
-                sellMultiple: 'Sell Multiple Products',
+                user_management: 'User Management',
+                new_user: 'New User',
+                user_note: 'Note: Creating a new user will automatically logout. Please login again.',
+                name: 'Name',
+                phone: 'Phone',
+                total_purchases: 'Total Purchases',
+                last_purchase: 'Last Purchase',
+                action: 'Action',
+                email: 'Email',
+                role: 'Role',
+                sell_multiple: 'Sell Multiple Products',
                 product: 'Product',
                 price: 'Price',
                 quantity: 'Quantity',
                 total: 'Total',
                 delete: 'Delete',
-                totalBill: 'Total Bill',
-                customerName: 'Customer Name',
-                mobileNumber: 'Mobile Number',
-                confirmSale: 'Confirm Sale & Create Invoice',
-                printPreview: 'Print Preview (A4 Size)',
+                total_bill: 'Total Bill',
+                customer_name: 'Customer Name',
+                mobile_number: 'Mobile Number',
+                confirm_sale: 'Confirm Sale & Create Invoice',
+                print_preview: 'Print Preview (A4 Size)',
                 close: 'Close',
                 print: 'Print',
+                save: 'Save',
+                create: 'Create',
+                edit_user: 'Edit User',
+                update: 'Update',
+                password: 'Password',
                 date: 'Date',
-                invoiceNo: 'Invoice No',
+                invoice_no: 'Invoice No',
                 customer: 'Customer',
                 items: 'Items',
-                seller: 'Seller',
-                action: 'Action',
-                name: 'Name',
-                phone: 'Phone',
-                totalPurchases: 'Total Purchases',
-                lastPurchase: 'Last Purchase',
-                email: 'Email',
-                role: 'Role',
-                editUser: 'Edit User',
-                update: 'Update',
-                create: 'Create',
-                save: 'Save',
-                productName: 'Product Name',
-                buyPrice: 'Buy Price',
-                sellPrice: 'Sell Price',
-                warranty: 'Warranty (months)'
+                seller: 'Seller'
             }
         };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'bn' ? 'en' : 'bn';
+            document.getElementById('langLabel').textContent = currentLang.toUpperCase();
+            
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+            
+            localStorage.setItem('language', currentLang);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
 
         // Number to Words
         function numberToWords(num) {
@@ -1080,23 +1099,6 @@
             let result = convert(intPart);
             if (decPart > 0) result += ' and ' + convert(decPart) + ' Paisa';
             return result + ' Only';
-        }
-
-        // Language Toggle
-        function toggleLanguage() {
-            currentLang = currentLang === 'bn' ? 'en' : 'bn';
-            document.querySelectorAll('[data-lang]').forEach(el => {
-                const key = el.getAttribute('data-lang');
-                if (translations[currentLang][key]) {
-                    el.textContent = translations[currentLang][key];
-                }
-            });
-        }
-
-        // Theme Toggle
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
 
         // Auth Functions
@@ -1150,74 +1152,85 @@
             await loadProducts();
             await loadSales();
             await loadCustomers();
-            await updateCharts();
+            
+            // Initialize charts after data is loaded
+            setTimeout(() => {
+                updateCharts();
+            }, 1000);
+            
             await populateUserReportDropdown();
             checkLowStock();
             
-            // Load saved theme
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-            }
+            // Load saved preferences
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
+            
+            const savedLang = localStorage.getItem('language');
+            if (savedLang && savedLang !== currentLang) toggleLanguage();
         }
 
-        // Chart Functions - Fixed
-        async function updateCharts() {
-            // Wait for DOM to be ready
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
+        // Chart Functions - FIXED
+        function updateCharts() {
             // Destroy existing charts
-            if (stockChart) stockChart.destroy();
-            if (salesChart) salesChart.destroy();
-            if (salesTrendChart) salesTrendChart.destroy();
-            if (profitLossChart) profitLossChart.destroy();
+            if (stockChart) { stockChart.destroy(); stockChart = null; }
+            if (salesChart) { salesChart.destroy(); salesChart = null; }
+            if (salesTrendChart) { salesTrendChart.destroy(); salesTrendChart = null; }
+            if (profitLossChart) { profitLossChart.destroy(); profitLossChart = null; }
 
             // Stock Chart
-            const stockCtx = document.getElementById('stockChart');
-            if (stockCtx) {
-                stockChart = new Chart(stockCtx.getContext('2d'), {
+            const stockCanvas = document.getElementById('stockChart');
+            if (stockCanvas && products.length > 0) {
+                stockChart = new Chart(stockCanvas.getContext('2d'), {
                     type: 'bar',
                     data: {
-                        labels: products.slice(0, 10).map(p => p.name.substring(0, 15)),
+                        labels: products.map(p => p.name.substring(0, 15)),
                         datasets: [{
-                            label: 'Stock',
-                            data: products.slice(0, 10).map(p => p.qty),
-                            backgroundColor: products.slice(0, 10).map(p => p.qty <= 5 ? '#dc3545' : '#28a745')
+                            label: 'Stock Quantity',
+                            data: products.map(p => p.qty),
+                            backgroundColor: products.map(p => p.qty <= 5 ? '#dc3545' : '#28a745')
                         }]
                     },
                     options: { 
-                        responsive: true, 
+                        responsive: true,
                         maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } } 
+                        scales: { y: { beginAtZero: true } }
                     }
                 });
             }
 
             // Sales Chart
-            const salesCtx = document.getElementById('salesChart');
-            if (salesCtx) {
+            const salesCanvas = document.getElementById('salesChart');
+            if (salesCanvas && sales.length > 0) {
                 const salesByProduct = {};
                 sales.forEach(s => {
-                    s.items.forEach(item => {
-                        salesByProduct[item.name] = (salesByProduct[item.name] || 0) + item.qty;
-                    });
+                    if (s.items) {
+                        s.items.forEach(item => {
+                            salesByProduct[item.name] = (salesByProduct[item.name] || 0) + item.qty;
+                        });
+                    }
                 });
                 
-                salesChart = new Chart(salesCtx.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(salesByProduct).slice(0, 5).map(n => n.substring(0, 15)),
-                        datasets: [{
-                            data: Object.values(salesByProduct).slice(0, 5),
-                            backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b']
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
+                const labels = Object.keys(salesByProduct).map(n => n.substring(0, 15));
+                const data = Object.values(salesByProduct);
+                
+                if (labels.length > 0) {
+                    salesChart = new Chart(salesCanvas.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a']
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
             }
 
-            // Sales Trend
-            const trendCtx = document.getElementById('salesTrendChart');
-            if (trendCtx) {
+            // Sales Trend (Last 30 days)
+            const trendCanvas = document.getElementById('salesTrendChart');
+            if (trendCanvas) {
                 const last30Days = [];
                 const salesData = [];
                 for (let i = 29; i >= 0; i--) {
@@ -1227,19 +1240,20 @@
                     last30Days.push(dateStr);
                     
                     const daySales = sales.filter(s => {
-                        const sDate = s.createdAt?.toDate().toLocaleDateString('en-GB');
+                        if (!s.createdAt) return false;
+                        const sDate = s.createdAt.toDate ? s.createdAt.toDate().toLocaleDateString('en-GB') : '';
                         return sDate === dateStr;
-                    }).reduce((sum, s) => sum + s.total, 0);
+                    }).reduce((sum, s) => sum + (s.total || 0), 0);
                     
                     salesData.push(daySales);
                 }
                 
-                salesTrendChart = new Chart(trendCtx.getContext('2d'), {
+                salesTrendChart = new Chart(trendCanvas.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: last30Days,
                         datasets: [{
-                            label: 'Sales ()',
+                            label: 'Sales (৳)',
                             data: salesData,
                             borderColor: '#667eea',
                             fill: true,
@@ -1247,71 +1261,82 @@
                         }]
                     },
                     options: { 
-                        responsive: true, 
+                        responsive: true,
                         maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } } 
+                        scales: { y: { beginAtZero: true } }
                     }
                 });
             }
 
             // Profit/Loss Chart
-            const profitCtx = document.getElementById('profitLossChart');
-            if (profitCtx && currentUser.role === 'admin') {
+            const profitCanvas = document.getElementById('profitLossChart');
+            if (profitCanvas && currentUser && currentUser.role === 'admin' && products.length > 0) {
                 const profitData = [];
                 const lossData = [];
+                const labels = [];
                 
-                sales.forEach(sale => {
-                    sale.items.forEach(item => {
-                        const product = products.find(p => p.id === item.id);
-                        if (product) {
-                            const profit = (item.price - product.buyPrice) * item.qty;
-                            if (profit > 0) {
-                                profitData.push(profit);
-                            } else {
-                                lossData.push(Math.abs(profit));
-                            }
-                        }
-                    });
+                products.forEach(p => {
+                    const sold = sales.reduce((sum, s) => {
+                        if (!s.items) return sum;
+                        const item = s.items.find(i => i.id === p.id);
+                        return sum + (item ? item.qty : 0);
+                    }, 0);
+                    
+                    const profit = ((p.salePrice || 0) - (p.buyPrice || 0)) * sold;
+                    labels.push(p.name.substring(0, 15));
+                    profitData.push(profit > 0 ? profit : 0);
+                    lossData.push(profit < 0 ? Math.abs(profit) : 0);
                 });
                 
-                profitLossChart = new Chart(profitCtx.getContext('2d'), {
+                profitLossChart = new Chart(profitCanvas.getContext('2d'), {
                     type: 'bar',
                     data: {
-                        labels: ['Profit', 'Loss'],
-                        datasets: [{
-                            label: 'Amount (৳)',
-                            data: [
-                                profitData.reduce((a, b) => a + b, 0),
-                                lossData.reduce((a, b) => a + b, 0)
-                            ],
-                            backgroundColor: ['#28a745', '#dc3545']
-                        }]
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Profit',
+                                data: profitData,
+                                backgroundColor: '#28a745'
+                            },
+                            {
+                                label: 'Loss',
+                                data: lossData,
+                                backgroundColor: '#dc3545'
+                            }
+                        ]
                     },
-                    options: { 
-                        responsive: true, 
+                    options: {
+                        responsive: true,
                         maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } } 
+                        scales: { 
+                            x: { stacked: true },
+                            y: { beginAtZero: true, stacked: true }
+                        }
                     }
                 });
             }
         }
 
-        // Low Stock Check
+        // Low Stock Alert
         function checkLowStock() {
             const lowStockProducts = products.filter(p => p.qty <= 5);
             if (lowStockProducts.length > 0) {
-                const alertDiv = document.getElementById('lowStockAlert');
-                alertDiv.innerHTML = `
-                    <div class="alert alert-danger alert-low-stock">
-                        <strong><i class="fa-solid fa-exclamation-triangle me-2"></i>Low Stock Alert!</strong>
-                        <ul class="mb-0 mt-2">
-                            ${lowStockProducts.map(p => `<li>${p.name}: ${p.qty} remaining</li>`).join('')}
-                        </ul>
-                        <button class="btn btn-sm btn-danger mt-2" onclick="this.parentElement.remove()">Close</button>
-                    </div>
-                `;
+                const notificationArea = document.getElementById('notificationArea');
+                notificationArea.innerHTML = '';
+                
+                lowStockProducts.forEach(p => {
+                    const alert = document.createElement('div');
+                    alert.className = 'low-stock-alert';
+                    alert.innerHTML = `
+                        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                        <strong>Low Stock:</strong> ${p.name} - Only ${p.qty} left!
+                        <button class="btn btn-sm btn-light ms-2" onclick="this.parentElement.remove()">×</button>
+                    `;
+                    notificationArea.appendChild(alert);
+                });
+                
                 setTimeout(() => {
-                    if (alertDiv.firstChild) alertDiv.firstChild.remove();
+                    notificationArea.innerHTML = '';
                 }, 10000);
             }
         }
@@ -1329,13 +1354,13 @@
             const search = document.getElementById('searchProduct').value.toLowerCase();
             container.innerHTML = '';
             
-            const isAdmin = currentUser?.role === 'admin';
+            const isAdmin = currentUser && currentUser.role === 'admin';
             
             products.filter(p => 
                 p.name.toLowerCase().includes(search) || 
                 p.sku.toLowerCase().includes(search) ||
                 (p.serial && p.serial.toLowerCase().includes(search)) ||
-                (p.barcode && p.barcode.toLowerCase().includes(search))
+                (p.barcode && p.barcode.includes(search))
             ).forEach(product => {
                 const div = document.createElement('div');
                 div.className = 'col-md-4 col-lg-3';
@@ -1354,10 +1379,10 @@
                         <h6>${product.name} ${warrantyHTML}</h6>
                         <div class="product-sku">SKU: ${product.sku}</div>
                         ${product.serial ? `<div class="product-sku">SN: ${product.serial}</div>` : ''}
-                        ${product.barcode ? `<div class="product-sku">Barcode: ${product.barcode}</div>` : ''}
+                        ${product.barcode ? `<div class="product-sku"><i class="fa-solid fa-barcode me-1"></i>${product.barcode}</div>` : ''}
                         <div class="price-box">
                             ${buyPriceHTML}
-                            <div class="sell-price">Sell: ৳${product.salePrice}</div>
+                            <div class="sell-price">Sell: ${product.salePrice}</div>
                         </div>
                         <div class="stock-badge ${product.qty <= 5 ? 'bg-danger' : 'bg-success'}">
                             <i class="fa-solid fa-box me-1"></i>Stock: ${product.qty}
@@ -1404,11 +1429,11 @@
                     id: product.id, 
                     name: product.name, 
                     price: product.salePrice, 
+                    buyPrice: product.buyPrice,
                     qty: 1, 
                     maxStock: product.qty,
                     serial: product.serial,
-                    warranty: product.warranty,
-                    buyPrice: product.buyPrice
+                    warranty: product.warranty
                 });
             }
             updateCartCount();
@@ -1457,7 +1482,7 @@
             openCart();
         }
 
-        // Sale Functions - Fixed to show invoice
+        // Sale Functions - FIXED INVOICE CREATION
         async function confirmSale() {
             const custName = document.getElementById('custName').value;
             const custPhone = document.getElementById('custPhone').value;
@@ -1467,60 +1492,173 @@
                 return;
             }
             
+            if (cart.length === 0) {
+                alert('কার্ট খালি!');
+                return;
+            }
+            
             const user = JSON.parse(localStorage.getItem('user'));
             const invoiceNo = 'INV-' + Date.now().toString().slice(-8);
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             const saleDate = new Date();
             
-            // Update stock
-            for (const item of cart) {
-                await db.collection('products').doc(item.id).update({
-                    qty: firebase.firestore.FieldValue.increment(-item.qty)
+            try {
+                // Update stock
+                for (const item of cart) {
+                    await db.collection('products').doc(item.id).update({
+                        qty: firebase.firestore.FieldValue.increment(-item.qty)
+                    });
+                }
+                
+                // Save sale
+                const saleData = {
+                    invoiceNo,
+                    customer: custName,
+                    phone: custPhone,
+                    items: [...cart],
+                    total,
+                    soldBy: user.name,
+                    soldByUid: user.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    saleDate: saleDate.toISOString(),
+                    expiryDate: new Date(saleDate.getFullYear() + 10, saleDate.getMonth(), saleDate.getDate()).toISOString()
+                };
+                
+                await db.collection('sales').add(saleData);
+                
+                // Save/Update customer
+                await saveCustomer(custName, custPhone, total);
+                
+                // Close cart modal
+                const cartModalEl = document.getElementById('cartModal');
+                const cartModal = bootstrap.Modal.getInstance(cartModalEl);
+                if (cartModal) {
+                    cartModal.hide();
+                }
+                
+                // Wait for modal to fully close
+                cartModalEl.addEventListener('hidden.bs.modal', function handler() {
+                    cartModalEl.removeEventListener('hidden.bs.modal', handler);
+                    
+                    // Set current invoice and generate
+                    currentInvoice = saleData;
+                    generateInvoice();
+                    
+                    // Show invoice modal
+                    const invoiceModal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+                    invoiceModal.show();
+                }, { once: true });
+                
+                // Reset cart
+                cart = [];
+                updateCartCount();
+                document.getElementById('custName').value = '';
+                document.getElementById('custPhone').value = '';
+                
+                // Reload data
+                await loadProducts();
+                await loadSales();
+                await loadCustomers();
+                setTimeout(() => updateCharts(), 500);
+                checkLowStock();
+                
+            } catch (error) {
+                alert('বিক্রয় সম্পন্ন করতে সমস্যা: ' + error.message);
+            }
+        }
+
+        // Customer Database
+        async function saveCustomer(name, phone, amount) {
+            const customerRef = db.collection('customers').doc(phone);
+            const customerDoc = await customerRef.get();
+            
+            if (customerDoc.exists) {
+                await customerRef.update({
+                    totalSpent: firebase.firestore.FieldValue.increment(amount),
+                    purchaseCount: firebase.firestore.FieldValue.increment(1),
+                    lastPurchase: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } else {
+                await customerRef.set({
+                    name,
+                    phone,
+                    totalSpent: amount,
+                    purchaseCount: 1,
+                    lastPurchase: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
+        }
+
+        async function loadCustomers() {
+            const snapshot = await db.collection('customers').orderBy('lastPurchase', 'desc').get();
+            customers = [];
+            snapshot.forEach(doc => customers.push({ id: doc.id, ...doc.data() }));
+            renderCustomers();
+        }
+
+        function renderCustomers() {
+            const tbody = document.getElementById('customersTable');
+            if (!tbody) return;
             
-            // Save sale
-            const saleData = {
-                invoiceNo,
-                customer: custName,
-                phone: custPhone,
-                items: [...cart],
-                total,
-                soldBy: user.name,
-                soldByUid: user.uid,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                saleDate: saleDate.toISOString(),
-                expiryDate: new Date(saleDate.getFullYear() + 10, saleDate.getMonth(), saleDate.getDate()).toISOString()
-            };
+            tbody.innerHTML = '';
+            customers.forEach(cust => {
+                const tr = document.createElement('tr');
+                const lastPurchase = cust.lastPurchase?.toDate ? cust.lastPurchase.toDate().toLocaleDateString('bn-BD') : 'N/A';
+                tr.innerHTML = `
+                    <td>${cust.name}</td>
+                    <td>${cust.phone}</td>
+                    <td>৳${cust.totalSpent || 0} (${cust.purchaseCount || 0} বার)</td>
+                    <td>${lastPurchase}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewCustomerHistory('${cust.phone}')">
+                            <i class="fa-solid fa-history"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function viewCustomerHistory(phone) {
+            const custSales = sales.filter(s => s.phone === phone);
+            const container = document.getElementById('reportResults');
             
-            await db.collection('sales').add(saleData);
+            let html = `
+                <div class="card border-0 shadow mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">কাস্টমার হিস্ট্রি: ${phone}</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>তারিখ</th>
+                                    <th>ইনভয়েস</th>
+                                    <th>প্রোডাক্ট</th>
+                                    <th>টোটাল</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
             
-            // Save/Update customer
-            await saveCustomer(custName, custPhone, total);
+            custSales.forEach(sale => {
+                html += `
+                    <tr>
+                        <td>${sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A'}</td>
+                        <td>${sale.invoiceNo}</td>
+                        <td>${sale.items.map(i => `${i.name} (x${i.qty})`).join(', ')}</td>
+                        <td>৳${sale.total}</td>
+                    </tr>
+                `;
+            });
             
-            currentInvoice = saleData;
+            html += '</tbody></table></div></div>';
+            container.innerHTML = html;
             
-            // Close cart modal first
-            const cartModal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
-            if (cartModal) cartModal.hide();
-            
-            // Wait for modal to close, then show invoice
-            setTimeout(() => {
-                generateInvoice();
-                const invoiceModal = new bootstrap.Modal(document.getElementById('invoiceModal'));
-                invoiceModal.show();
-            }, 500);
-            
-            cart = [];
-            updateCartCount();
-            document.getElementById('custName').value = '';
-            document.getElementById('custPhone').value = '';
-            
-            await loadProducts();
-            await loadSales();
-            await loadCustomers();
-            await updateCharts();
-            checkLowStock();
+            // Switch to reports tab
+            const reportsTab = document.querySelector('[data-bs-target="#reports"]');
+            if (reportsTab) new bootstrap.Tab(reportsTab).show();
         }
 
         function generateInvoice() {
@@ -1687,7 +1825,7 @@
             tbody.innerHTML = '';
             
             sales.forEach(sale => {
-                const date = sale.createdAt?.toDate().toLocaleDateString('bn-BD') || 'N/A';
+                const date = sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${date}</td>
@@ -1716,7 +1854,7 @@
             doc.text('Sales Report', 140, 15, { align: 'center' });
             
             const tableData = sales.map(sale => [
-                sale.createdAt?.toDate().toLocaleDateString('bn-BD') || 'N/A',
+                sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A',
                 sale.invoiceNo, 
                 sale.customer, 
                 sale.items.map(i => i.name).join(', '), 
@@ -1731,97 +1869,6 @@
             });
             doc.save('sales_report.pdf');
         }
-
-        // Customer Functions
-        async function loadCustomers() {
-            const snapshot = await db.collection('customers').orderBy('lastPurchase', 'desc').get();
-            customers = [];
-            snapshot.forEach(doc => customers.push({ id: doc.id, ...doc.data() }));
-            renderCustomers();
-        }
-
-        async function saveCustomer(name, phone, amount) {
-            const existing = customers.find(c => c.phone === phone);
-            if (existing) {
-                await db.collection('customers').doc(existing.id).update({
-                    totalSpent: firebase.firestore.FieldValue.increment(amount),
-                    purchaseCount: firebase.firestore.FieldValue.increment(1),
-                    lastPurchase: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } else {
-                await db.collection('customers').add({
-                    name,
-                    phone,
-                    totalSpent: amount,
-                    purchaseCount: 1,
-                    lastPurchase: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }
-        }
-
-        function renderCustomers() {
-            const search = document.getElementById('searchCustomer')?.value.toLowerCase() || '';
-            const tbody = document.getElementById('customersTable');
-            tbody.innerHTML = '';
-            
-            customers.filter(c => 
-                c.name.toLowerCase().includes(search) || 
-                c.phone.includes(search)
-            ).forEach(customer => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${customer.name}</td>
-                    <td>${customer.phone}</td>
-                    <td>${customer.totalSpent || 0} (${customer.purchaseCount || 0} বার)</td>
-                    <td>${customer.lastPurchase?.toDate().toLocaleDateString('bn-BD') || 'N/A'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewCustomerHistory('${customer.phone}')">
-                            <i class="fa-solid fa-history"></i> ইতিহাস
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function viewCustomerHistory(phone) {
-            const customerSales = sales.filter(s => s.phone === phone);
-            const content = document.getElementById('customerHistoryContent');
-            
-            if (customerSales.length === 0) {
-                content.innerHTML = '<p class="text-muted">কোন ক্রয় ইতিহাস পাওয়া যায়নি</p>';
-            } else {
-                content.innerHTML = `
-                    <table class="table table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>তারিখ</th>
-                                <th>ইনভয়েস</th>
-                                <th>প্রোডাক্ট</th>
-                                <th>পরিমাণ</th>
-                                <th>মোট</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${customerSales.map(sale => `
-                                <tr>
-                                    <td>${sale.createdAt?.toDate().toLocaleDateString('bn-BD')}</td>
-                                    <td>${sale.invoiceNo}</td>
-                                    <td>${sale.items.map(i => i.name).join(', ')}</td>
-                                    <td>${sale.items.reduce((sum, i) => sum + i.qty, 0)}</td>
-                                    <td>৳${sale.total}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            }
-            
-            new bootstrap.Modal(document.getElementById('customerHistoryModal')).show();
-        }
-
-        document.getElementById('searchCustomer').addEventListener('input', renderCustomers);
 
         // Report Functions
         async function populateUserReportDropdown() {
@@ -1844,7 +1891,8 @@
             }
             
             const filtered = sales.filter(s => {
-                const sDate = s.createdAt?.toDate().toISOString().split('T')[0];
+                if (!s.createdAt) return false;
+                const sDate = s.createdAt.toDate ? s.createdAt.toDate().toISOString().split('T')[0] : '';
                 return sDate >= start && sDate <= end;
             });
             
@@ -1869,7 +1917,7 @@
             }
             
             const filtered = sales.filter(s => 
-                s.items.some(item => item.serial && item.serial.toLowerCase().includes(sn.toLowerCase()))
+                s.items && s.items.some(item => item.serial && item.serial.toLowerCase().includes(sn.toLowerCase()))
             );
             
             displayReport(filtered, `সিরিয়াল নম্বর: ${sn}`);
@@ -1910,7 +1958,7 @@
             data.forEach(sale => {
                 html += `
                     <tr>
-                        <td>${sale.createdAt?.toDate().toLocaleDateString('bn-BD')}</td>
+                        <td>${sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A'}</td>
                         <td>${sale.invoiceNo}</td>
                         <td>${sale.customer}</td>
                         <td>${sale.items.map(i => `${i.name} (x${i.qty})`).join(', ')}</td>
@@ -1948,7 +1996,7 @@
             doc.text('Sales Report', 140, 15, { align: 'center' });
             
             const tableData = window.currentReportData.map(sale => [
-                sale.createdAt?.toDate().toLocaleDateString('bn-BD'),
+                sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A',
                 sale.invoiceNo,
                 sale.customer,
                 sale.items.map(i => i.name).join(', '),
@@ -1963,97 +2011,6 @@
             });
             
             doc.save('report.pdf');
-        }
-
-        // Backup/Restore
-        async function backupData() {
-            const data = {
-                products,
-                sales,
-                customers,
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `amin_computer_backup_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            alert('ব্যাকআপ সফলভাবে ডাউনলোড হয়েছে!');
-        }
-
-        async function restoreData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (confirm('এই ডাটা রিস্টোর করলে বর্তমান ডাটা মুছে যাবে। আপনি কি নিশ্চিত?')) {
-                        // Restore products
-                        for (const product of data.products) {
-                            await db.collection('products').doc(product.id).set(product);
-                        }
-                        
-                        // Restore sales
-                        for (const sale of data.sales) {
-                            await db.collection('sales').doc(sale.id).set(sale);
-                        }
-                        
-                        // Restore customers
-                        for (const customer of data.customers) {
-                            await db.collection('customers').doc(customer.id).set(customer);
-                        }
-                        
-                        alert('ডাটা সফলভাবে রিস্টোর হয়েছে!');
-                        location.reload();
-                    }
-                } catch (error) {
-                    alert('রিস্টোর করতে সমস্যা: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        // Barcode Scanner
-        function startBarcodeScanner() {
-            const modal = new bootstrap.Modal(document.getElementById('barcodeModal'));
-            modal.show();
-            
-            html5QrCode = new Html5Qrcode("barcodeReader");
-            
-            html5QrCode.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                (decodedText) => {
-                    // Barcode scanned
-                    document.getElementById('searchProduct').value = decodedText;
-                    renderProducts();
-                    stopBarcodeScanner();
-                    bootstrap.Modal.getInstance(document.getElementById('barcodeModal')).hide();
-                    alert('বারকোড স্ক্যান হয়েছে: ' + decodedText);
-                },
-                (error) => {
-                    // Scan error - ignore
-                }
-            ).catch(err => {
-                alert('ক্যামেরা শুরু করতে সমস্যা: ' + err);
-            });
-        }
-
-        function stopBarcodeScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                }).catch(err => {
-                    console.log('Stop error:', err);
-                });
-            }
         }
 
         // User Management
@@ -2163,7 +2120,7 @@
             bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
             e.target.reset();
             await loadProducts();
-            await updateCharts();
+            setTimeout(() => updateCharts(), 500);
         });
 
         async function editProduct(id) {
@@ -2181,7 +2138,7 @@
                     qty: Number(newQty)
                 });
                 await loadProducts();
-                await updateCharts();
+                setTimeout(() => updateCharts(), 500);
             }
         }
 
@@ -2189,9 +2146,143 @@
             if (confirm('এই প্রোডাক্ট ডিলিট করবেন?')) {
                 await db.collection('products').doc(id).delete();
                 await loadProducts();
-                await updateCharts();
+                setTimeout(() => updateCharts(), 500);
             }
         }
+
+        // Barcode Scanner
+        function openBarcodeScanner() {
+            new bootstrap.Modal(document.getElementById('barcodeModal')).show();
+            
+            setTimeout(() => {
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    onScanSuccess,
+                    onScanFailure
+                ).catch(err => {
+                    console.log("Camera error:", err);
+                });
+            }, 500);
+        }
+
+        function stopBarcodeScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(err => {
+                    console.log("Stop error:", err);
+                });
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById('manualBarcode').value = decodedText;
+            searchByBarcode();
+            stopBarcodeScanner();
+            bootstrap.Modal.getInstance(document.getElementById('barcodeModal')).hide();
+        }
+
+        function onScanFailure(error) {
+            // console.warn(`Code scan error = ${error}`);
+        }
+
+        function searchByBarcode() {
+            const barcode = document.getElementById('manualBarcode').value.trim();
+            if (!barcode) {
+                alert('বারকোড নম্বর দিন');
+                return;
+            }
+            
+            const product = products.find(p => p.barcode === barcode);
+            if (product) {
+                addToCart(product.id);
+                alert(`প্রোডাক্ট যোগ হয়েছে: ${product.name}`);
+            } else {
+                alert('এই বারকোডের প্রোডাক্ট পাওয়া যায়নি!');
+            }
+        }
+
+        // Backup/Restore
+        async function backupData() {
+            const data = {
+                products: products,
+                sales: sales,
+                customers: customers,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `amin_computer_backup_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            alert('ব্যাকআপ সফলভাবে ডাউনলোড হয়েছে!');
+        }
+
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        if (confirm('এটি বর্তমান ডাটা মুছে নতুন ডাটা লোড করবে। আপনি কি নিশ্চিত?')) {
+                            // Restore products
+                            for (const product of data.products) {
+                                await db.collection('products').add(product);
+                            }
+                            
+                            // Restore sales
+                            for (const sale of data.sales) {
+                                await db.collection('sales').add(sale);
+                            }
+                            
+                            // Restore customers
+                            for (const customer of data.customers) {
+                                await db.collection('customers').doc(customer.phone).set(customer);
+                            }
+                            
+                            alert('ডাটা সফলভাবে রিস্টোর হয়েছে!');
+                            location.reload();
+                        }
+                    } catch (error) {
+                        alert('রিস্টোর করতে সমস্যা: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // Add backup/restore buttons to navbar
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.querySelector('.navbar-custom .container-fluid');
+            const backupBtn = document.createElement('button');
+            backupBtn.className = 'btn btn-sm btn-light me-2';
+            backupBtn.innerHTML = '<i class="fa-solid fa-download me-1"></i>ব্যাকআপ';
+            backupBtn.onclick = backupData;
+            
+            const restoreBtn = document.createElement('button');
+            restoreBtn.className = 'btn btn-sm btn-light me-2';
+            restoreBtn.innerHTML = '<i class="fa-solid fa-upload me-1"></i>রিস্টোর';
+            restoreBtn.onclick = restoreData;
+            
+            navbar.insertBefore(backupBtn, navbar.firstChild);
+            navbar.insertBefore(restoreBtn, navbar.firstChild);
+        });
 
         document.getElementById('searchProduct').addEventListener('input', renderProducts);
         auth.onAuthStateChanged(() => {
