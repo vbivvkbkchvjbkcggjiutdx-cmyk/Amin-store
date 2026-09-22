@@ -683,8 +683,6 @@
                     <div id="printArea" class="invoice-box">
                         <div class="text-center mb-4">
                             <h2 class="text-decoration-underline" id="docTitle">INVOICE/BILL</h2>
-                            <p class="mb-0">Amin Computer</p>
-                            <p class="mb-0" style="font-size: 10pt;">Cell: +880175911108 | E-mail: amintechnology16@gmail.com</p>
                         </div>
                         <div class="row mb-3">
                             <div class="col-6">
@@ -753,6 +751,8 @@
                             <p>Sincerely yours,</p>
                             <p class="mt-4"><strong>Md. Nacher Uddin Reaz</strong></p>
                             <p>Proprietor of Amin Computer</p>
+                            <p>Cell: +880175911108</p>
+                            <p>E-mail: amintechnology16@gmail.com</p>
                         </div>
                     </div>
                 </div>
@@ -1079,25 +1079,72 @@
             localStorage.setItem('theme', newTheme);
         }
 
-        // Number to Words
+        // FIXED: Number to Words - Properly working
         function numberToWords(num) {
-            if (num === 0) return 'Zero Only';
-            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            if (num === 0) return 'Zero Taka Only';
             
-            function convert(n) {
-                if (n === 0) return '';
-                if (n < 10) return ones[n];
-                if (n < 20) return teens[n - 10];
-                if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
-                return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + convert(n % 100) : '');
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+                         'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            
+            function convertHundreds(n) {
+                let result = '';
+                if (n >= 100) {
+                    result += ones[Math.floor(n / 100)] + ' Hundred ';
+                    n = n % 100;
+                }
+                if (n >= 20) {
+                    result += tens[Math.floor(n / 10)] + ' ';
+                    n = n % 10;
+                }
+                if (n > 0) {
+                    result += ones[n] + ' ';
+                }
+                return result.trim();
             }
             
-            const intPart = Math.floor(num);
-            const decPart = Math.round((num - intPart) * 100);
-            let result = convert(intPart);
-            if (decPart > 0) result += ' and ' + convert(decPart) + ' Paisa';
+            // Handle decimal
+            const numStr = num.toString();
+            let intPart = Math.floor(num);
+            let decPart = 0;
+            
+            if (numStr.includes('.')) {
+                const decimals = numStr.split('.')[1];
+                decPart = parseInt(decimals.substring(0, 2).padEnd(2, '0'));
+            }
+            
+            let result = '';
+            
+            if (intPart === 0) {
+                result = 'Zero';
+            } else {
+                // Crore
+                if (intPart >= 10000000) {
+                    result += convertHundreds(Math.floor(intPart / 10000000)) + ' Crore ';
+                    intPart = intPart % 10000000;
+                }
+                // Lakh
+                if (intPart >= 100000) {
+                    result += convertHundreds(Math.floor(intPart / 100000)) + ' Lakh ';
+                    intPart = intPart % 100000;
+                }
+                // Thousand
+                if (intPart >= 1000) {
+                    result += convertHundreds(Math.floor(intPart / 1000)) + ' Thousand ';
+                    intPart = intPart % 1000;
+                }
+                // Rest
+                if (intPart > 0) {
+                    result += convertHundreds(intPart);
+                }
+            }
+            
+            result = result.trim() + ' Taka';
+            
+            if (decPart > 0) {
+                result += ' and ' + convertHundreds(decPart) + ' Paisa';
+            }
+            
             return result + ' Only';
         }
 
@@ -1153,10 +1200,10 @@
             await loadSales();
             await loadCustomers();
             
-            // Initialize charts after data is loaded
+            // FIXED: Initialize charts after DOM is ready
             setTimeout(() => {
                 updateCharts();
-            }, 1000);
+            }, 1500);
             
             await populateUserReportDropdown();
             checkLowStock();
@@ -1169,9 +1216,9 @@
             if (savedLang && savedLang !== currentLang) toggleLanguage();
         }
 
-        // Chart Functions - FIXED
+        // FIXED: Chart Functions - Properly working
         function updateCharts() {
-            // Destroy existing charts
+            // Destroy existing charts first
             if (stockChart) { stockChart.destroy(); stockChart = null; }
             if (salesChart) { salesChart.destroy(); salesChart = null; }
             if (salesTrendChart) { salesTrendChart.destroy(); salesTrendChart = null; }
@@ -1180,14 +1227,15 @@
             // Stock Chart
             const stockCanvas = document.getElementById('stockChart');
             if (stockCanvas && products.length > 0) {
-                stockChart = new Chart(stockCanvas.getContext('2d'), {
+                const ctx = stockCanvas.getContext('2d');
+                stockChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: products.map(p => p.name.substring(0, 15)),
                         datasets: [{
                             label: 'Stock Quantity',
-                            data: products.map(p => p.qty),
-                            backgroundColor: products.map(p => p.qty <= 5 ? '#dc3545' : '#28a745')
+                            data: products.map(p => p.qty || 0),
+                            backgroundColor: products.map(p => (p.qty || 0) <= 5 ? '#dc3545' : '#28a745')
                         }]
                     },
                     options: { 
@@ -1203,9 +1251,10 @@
             if (salesCanvas && sales.length > 0) {
                 const salesByProduct = {};
                 sales.forEach(s => {
-                    if (s.items) {
+                    if (s.items && Array.isArray(s.items)) {
                         s.items.forEach(item => {
-                            salesByProduct[item.name] = (salesByProduct[item.name] || 0) + item.qty;
+                            const name = item.name || 'Unknown';
+                            salesByProduct[name] = (salesByProduct[name] || 0) + (item.qty || 0);
                         });
                     }
                 });
@@ -1214,13 +1263,14 @@
                 const data = Object.values(salesByProduct);
                 
                 if (labels.length > 0) {
-                    salesChart = new Chart(salesCanvas.getContext('2d'), {
+                    const ctx = salesCanvas.getContext('2d');
+                    salesChart = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
                             labels: labels,
                             datasets: [{
                                 data: data,
-                                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a']
+                                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#feca57', '#ff6b6b']
                             }]
                         },
                         options: { responsive: true, maintainAspectRatio: false }
@@ -1248,7 +1298,8 @@
                     salesData.push(daySales);
                 }
                 
-                salesTrendChart = new Chart(trendCanvas.getContext('2d'), {
+                const ctx = trendCanvas.getContext('2d');
+                salesTrendChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: last30Days,
@@ -1257,7 +1308,8 @@
                             data: salesData,
                             borderColor: '#667eea',
                             fill: true,
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4
                         }]
                     },
                     options: { 
@@ -1277,9 +1329,9 @@
                 
                 products.forEach(p => {
                     const sold = sales.reduce((sum, s) => {
-                        if (!s.items) return sum;
+                        if (!s.items || !Array.isArray(s.items)) return sum;
                         const item = s.items.find(i => i.id === p.id);
-                        return sum + (item ? item.qty : 0);
+                        return sum + (item ? (item.qty || 0) : 0);
                     }, 0);
                     
                     const profit = ((p.salePrice || 0) - (p.buyPrice || 0)) * sold;
@@ -1288,7 +1340,8 @@
                     lossData.push(profit < 0 ? Math.abs(profit) : 0);
                 });
                 
-                profitLossChart = new Chart(profitCanvas.getContext('2d'), {
+                const ctx = profitCanvas.getContext('2d');
+                profitLossChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -1319,7 +1372,7 @@
 
         // Low Stock Alert
         function checkLowStock() {
-            const lowStockProducts = products.filter(p => p.qty <= 5);
+            const lowStockProducts = products.filter(p => (p.qty || 0) <= 5);
             if (lowStockProducts.length > 0) {
                 const notificationArea = document.getElementById('notificationArea');
                 notificationArea.innerHTML = '';
@@ -1357,8 +1410,8 @@
             const isAdmin = currentUser && currentUser.role === 'admin';
             
             products.filter(p => 
-                p.name.toLowerCase().includes(search) || 
-                p.sku.toLowerCase().includes(search) ||
+                (p.name || '').toLowerCase().includes(search) || 
+                (p.sku || '').toLowerCase().includes(search) ||
                 (p.serial && p.serial.toLowerCase().includes(search)) ||
                 (p.barcode && p.barcode.includes(search))
             ).forEach(product => {
@@ -1366,7 +1419,7 @@
                 div.className = 'col-md-4 col-lg-3';
                 
                 const buyPriceHTML = isAdmin ? `
-                    <div class="buy-price hidden-price" onclick="toggleBuyPrice(this)" data-price="${product.buyPrice}">
+                    <div class="buy-price hidden-price" onclick="toggleBuyPrice(this)" data-price="${product.buyPrice || 0}">
                         Buy: ৳****
                     </div>
                 ` : '<div class="text-muted">Buy: N/A</div>';
@@ -1376,18 +1429,18 @@
                 
                 div.innerHTML = `
                     <div class="product-card">
-                        <h6>${product.name} ${warrantyHTML}</h6>
-                        <div class="product-sku">SKU: ${product.sku}</div>
+                        <h6>${product.name || 'Unknown'} ${warrantyHTML}</h6>
+                        <div class="product-sku">SKU: ${product.sku || 'N/A'}</div>
                         ${product.serial ? `<div class="product-sku">SN: ${product.serial}</div>` : ''}
                         ${product.barcode ? `<div class="product-sku"><i class="fa-solid fa-barcode me-1"></i>${product.barcode}</div>` : ''}
                         <div class="price-box">
                             ${buyPriceHTML}
-                            <div class="sell-price">Sell: ${product.salePrice}</div>
+                            <div class="sell-price">Sell: ৳${product.salePrice || 0}</div>
                         </div>
-                        <div class="stock-badge ${product.qty <= 5 ? 'bg-danger' : 'bg-success'}">
-                            <i class="fa-solid fa-box me-1"></i>Stock: ${product.qty}
+                        <div class="stock-badge ${(product.qty || 0) <= 5 ? 'bg-danger' : 'bg-success'}">
+                            <i class="fa-solid fa-box me-1"></i>Stock: ${product.qty || 0}
                         </div>
-                        <button class="btn btn-primary w-100 mt-2" onclick="addToCart('${product.id}')" ${product.qty <= 0 ? 'disabled' : ''}>
+                        <button class="btn btn-primary w-100 mt-2" onclick="addToCart('${product.id}')" ${(product.qty || 0) <= 0 ? 'disabled' : ''}>
                             <i class="fa-solid fa-cart-plus me-1"></i>Add to Cart
                         </button>
                         ${isAdmin ? `
@@ -1419,21 +1472,23 @@
 
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
             const existing = cart.find(c => c.id === productId);
             
             if (existing) {
-                if (existing.qty < product.qty) existing.qty++;
+                if (existing.qty < (product.qty || 0)) existing.qty++;
                 else { alert('পর্যাপ্ত স্টক নেই!'); return; }
             } else {
                 cart.push({ 
-                    id: product.id, 
-                    name: product.name, 
-                    price: product.salePrice, 
-                    buyPrice: product.buyPrice,
-                    qty: 1, 
-                    maxStock: product.qty,
-                    serial: product.serial,
-                    warranty: product.warranty
+                    id: product.id || '',
+                    name: product.name || '',
+                    price: Number(product.salePrice) || 0,
+                    buyPrice: Number(product.buyPrice) || 0,
+                    qty: 1,
+                    maxStock: Number(product.qty) || 0,
+                    serial: product.serial || '',
+                    warranty: Number(product.warranty) || 0
                 });
             }
             updateCartCount();
@@ -1441,7 +1496,7 @@
         }
 
         function updateCartCount() {
-            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            const count = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
             document.getElementById('cartCount').textContent = count;
         }
 
@@ -1453,14 +1508,14 @@
             let total = 0;
             
             cart.forEach((item, index) => {
-                const itemTotal = item.price * item.qty;
+                const itemTotal = (item.price || 0) * (item.qty || 1);
                 total += itemTotal;
                 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>৳${item.price}</td>
-                    <td><input type="number" class="form-control form-control-sm" value="${item.qty}" min="1" max="${item.maxStock}" onchange="updateCartQty(${index}, this.value)"></td>
+                    <td>${item.name || 'Unknown'}</td>
+                    <td>৳${item.price || 0}</td>
+                    <td><input type="number" class="form-control form-control-sm" value="${item.qty || 1}" min="1" max="${item.maxStock || 0}" onchange="updateCartQty(${index}, this.value)"></td>
                     <td>৳${itemTotal}</td>
                     <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})"><i class="fa-solid fa-times"></i></button></td>
                 `;
@@ -1472,7 +1527,7 @@
         }
 
         function updateCartQty(index, qty) {
-            cart[index].qty = parseInt(qty);
+            cart[index].qty = parseInt(qty) || 1;
             openCart();
         }
 
@@ -1482,10 +1537,10 @@
             openCart();
         }
 
-        // Sale Functions - FIXED INVOICE CREATION
+        // FIXED: Sale Functions - No undefined values
         async function confirmSale() {
-            const custName = document.getElementById('custName').value;
-            const custPhone = document.getElementById('custPhone').value;
+            const custName = document.getElementById('custName').value.trim();
+            const custPhone = document.getElementById('custPhone').value.trim();
             
             if (!custName || !custPhone) {
                 alert('অনুগ্রহ করে কাস্টমারের তথ্য দিন!');
@@ -1498,31 +1553,53 @@
             }
             
             const user = JSON.parse(localStorage.getItem('user'));
+            
+            // FIXED: Ensure all values are defined
+            const userUid = user.uid || 'unknown';
+            const userName = user.name || 'Unknown';
+            
             const invoiceNo = 'INV-' + Date.now().toString().slice(-8);
-            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const total = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 1)), 0);
             const saleDate = new Date();
+            
+            // FIXED: Clean cart items - remove ALL undefined values
+            const cleanCartItems = cart.map(item => ({
+                id: item.id || '',
+                name: item.name || 'Unknown',
+                price: Number(item.price) || 0,
+                buyPrice: Number(item.buyPrice) || 0,
+                qty: Number(item.qty) || 1,
+                maxStock: Number(item.maxStock) || 0,
+                serial: item.serial || '',
+                warranty: Number(item.warranty) || 0
+            }));
             
             try {
                 // Update stock
-                for (const item of cart) {
-                    await db.collection('products').doc(item.id).update({
-                        qty: firebase.firestore.FieldValue.increment(-item.qty)
-                    });
+                for (const item of cleanCartItems) {
+                    if (item.id) {
+                        await db.collection('products').doc(item.id).update({
+                            qty: firebase.firestore.FieldValue.increment(-item.qty)
+                        });
+                    }
                 }
                 
-                // Save sale
+                // FIXED: Create saleData with NO undefined values
                 const saleData = {
-                    invoiceNo,
+                    invoiceNo: invoiceNo,
                     customer: custName,
                     phone: custPhone,
-                    items: [...cart],
-                    total,
-                    soldBy: user.name,
-                    soldByUid: user.uid,
+                    items: cleanCartItems,
+                    total: Number(total) || 0,
+                    soldBy: userName,
+                    soldByUid: userUid,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     saleDate: saleDate.toISOString(),
                     expiryDate: new Date(saleDate.getFullYear() + 10, saleDate.getMonth(), saleDate.getDate()).toISOString()
                 };
+                
+                // Debug log
+                console.log('Saving sale data:', saleData);
                 
                 await db.collection('sales').add(saleData);
                 
@@ -1536,15 +1613,13 @@
                     cartModal.hide();
                 }
                 
-                // Wait for modal to fully close
+                // Wait for modal to fully close, then show invoice
                 cartModalEl.addEventListener('hidden.bs.modal', function handler() {
                     cartModalEl.removeEventListener('hidden.bs.modal', handler);
                     
-                    // Set current invoice and generate
                     currentInvoice = saleData;
                     generateInvoice();
                     
-                    // Show invoice modal
                     const invoiceModal = new bootstrap.Modal(document.getElementById('invoiceModal'));
                     invoiceModal.show();
                 }, { once: true });
@@ -1563,30 +1638,38 @@
                 checkLowStock();
                 
             } catch (error) {
+                console.error('Sale Error:', error);
                 alert('বিক্রয় সম্পন্ন করতে সমস্যা: ' + error.message);
             }
         }
 
         // Customer Database
         async function saveCustomer(name, phone, amount) {
-            const customerRef = db.collection('customers').doc(phone);
-            const customerDoc = await customerRef.get();
+            if (!phone) return;
             
-            if (customerDoc.exists) {
-                await customerRef.update({
-                    totalSpent: firebase.firestore.FieldValue.increment(amount),
-                    purchaseCount: firebase.firestore.FieldValue.increment(1),
-                    lastPurchase: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } else {
-                await customerRef.set({
-                    name,
-                    phone,
-                    totalSpent: amount,
-                    purchaseCount: 1,
-                    lastPurchase: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+            const customerRef = db.collection('customers').doc(phone);
+            
+            try {
+                const customerDoc = await customerRef.get();
+                
+                if (customerDoc.exists) {
+                    await customerRef.update({
+                        totalSpent: firebase.firestore.FieldValue.increment(Number(amount) || 0),
+                        purchaseCount: firebase.firestore.FieldValue.increment(1),
+                        lastPurchase: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    await customerRef.set({
+                        name: name || '',
+                        phone: phone || '',
+                        totalSpent: Number(amount) || 0,
+                        purchaseCount: 1,
+                        lastPurchase: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            } catch (error) {
+                console.error('Customer save error:', error);
             }
         }
 
@@ -1606,8 +1689,8 @@
                 const tr = document.createElement('tr');
                 const lastPurchase = cust.lastPurchase?.toDate ? cust.lastPurchase.toDate().toLocaleDateString('bn-BD') : 'N/A';
                 tr.innerHTML = `
-                    <td>${cust.name}</td>
-                    <td>${cust.phone}</td>
+                    <td>${cust.name || 'N/A'}</td>
+                    <td>${cust.phone || 'N/A'}</td>
                     <td>৳${cust.totalSpent || 0} (${cust.purchaseCount || 0} বার)</td>
                     <td>${lastPurchase}</td>
                     <td>
@@ -1646,9 +1729,9 @@
                 html += `
                     <tr>
                         <td>${sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A'}</td>
-                        <td>${sale.invoiceNo}</td>
-                        <td>${sale.items.map(i => `${i.name} (x${i.qty})`).join(', ')}</td>
-                        <td>৳${sale.total}</td>
+                        <td>${sale.invoiceNo || 'N/A'}</td>
+                        <td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join(', ')}</td>
+                        <td>৳${sale.total || 0}</td>
                     </tr>
                 `;
             });
@@ -1656,7 +1739,6 @@
             html += '</tbody></table></div></div>';
             container.innerHTML = html;
             
-            // Switch to reports tab
             const reportsTab = document.querySelector('[data-bs-target="#reports"]');
             if (reportsTab) new bootstrap.Tab(reportsTab).show();
         }
@@ -1664,27 +1746,27 @@
         function generateInvoice() {
             if (!currentInvoice) return;
             
-            document.getElementById('invCustomer').value = `${currentInvoice.customer} (${currentInvoice.phone})`;
-            document.getElementById('invNumber').value = currentInvoice.invoiceNo;
+            document.getElementById('invCustomer').value = `${currentInvoice.customer || ''} (${currentInvoice.phone || ''})`;
+            document.getElementById('invNumber').value = currentInvoice.invoiceNo || '';
             document.getElementById('invDate').value = new Date().toLocaleDateString('en-GB');
-            document.getElementById('invSubject').value = currentInvoice.items.map(i => i.name).join(', ');
+            document.getElementById('invSubject').value = (currentInvoice.items || []).map(i => i.name || '').join(', ');
             
             const invTbody = document.getElementById('invoiceItems');
             invTbody.innerHTML = '';
             invoiceRowCounter = 0;
             
-            currentInvoice.items.forEach((item) => {
+            (currentInvoice.items || []).forEach((item) => {
                 invoiceRowCounter++;
-                invTbody.appendChild(createInvoiceRow(invoiceRowCounter, item.name, item.qty, item.price));
+                invTbody.appendChild(createInvoiceRow(invoiceRowCounter, item.name || '', item.qty || 1, item.price || 0));
             });
             
             const chalTbody = document.getElementById('chalanItems');
             chalTbody.innerHTML = '';
             chalanRowCounter = 0;
             
-            currentInvoice.items.forEach((item) => {
+            (currentInvoice.items || []).forEach((item) => {
                 chalanRowCounter++;
-                chalTbody.appendChild(createChalanRow(chalanRowCounter, item.name, item.qty));
+                chalTbody.appendChild(createChalanRow(chalanRowCounter, item.name || '', item.qty || 1));
             });
             
             calculateInvoiceTotal();
@@ -1727,14 +1809,23 @@
             const rows = document.querySelectorAll('#invoiceItems tr');
             let total = 0;
             rows.forEach(row => {
-                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
-                const price = parseFloat(row.querySelector('.price-input').value) || 0;
-                const rowTotal = qty * price;
-                row.querySelector('.row-total').textContent = rowTotal.toFixed(2);
-                total += rowTotal;
+                const qtyInput = row.querySelector('.qty-input');
+                const priceInput = row.querySelector('.price-input');
+                const totalCell = row.querySelector('.row-total');
+                
+                if (qtyInput && priceInput && totalCell) {
+                    const qty = parseFloat(qtyInput.value) || 0;
+                    const price = parseFloat(priceInput.value) || 0;
+                    const rowTotal = qty * price;
+                    totalCell.textContent = rowTotal.toFixed(2);
+                    total += rowTotal;
+                }
             });
             document.getElementById('invoiceTotal').textContent = total.toFixed(2);
-            document.getElementById('amountInWords').textContent = numberToWords(total);
+            
+            // FIXED: In Words now working properly
+            const inWords = numberToWords(total);
+            document.getElementById('amountInWords').textContent = inWords;
         }
 
         function switchDocType(type) {
@@ -1829,11 +1920,11 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${date}</td>
-                    <td><code>${sale.invoiceNo}</code></td>
-                    <td>${sale.customer}<br><small class="text-muted">${sale.phone}</small></td>
-                    <td>${sale.items.map(i => `${i.name} (x${i.qty})`).join('<br>')}</td>
-                    <td class="fw-bold text-success">৳${sale.total}</td>
-                    <td><span class="badge bg-info">${sale.soldBy}</span></td>
+                    <td><code>${sale.invoiceNo || 'N/A'}</code></td>
+                    <td>${sale.customer || 'N/A'}<br><small class="text-muted">${sale.phone || ''}</small></td>
+                    <td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join('<br>')}</td>
+                    <td class="fw-bold text-success">৳${sale.total || 0}</td>
+                    <td><span class="badge bg-info">${sale.soldBy || 'N/A'}</span></td>
                     <td><button class="btn btn-sm btn-primary" onclick="viewInvoice('${sale.id}')"><i class="fa-solid fa-eye"></i></button></td>
                 `;
                 tbody.appendChild(tr);
@@ -1855,11 +1946,11 @@
             
             const tableData = sales.map(sale => [
                 sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A',
-                sale.invoiceNo, 
-                sale.customer, 
-                sale.items.map(i => i.name).join(', '), 
-                `৳${sale.total}`, 
-                sale.soldBy
+                sale.invoiceNo || 'N/A', 
+                sale.customer || 'N/A', 
+                (sale.items || []).map(i => i.name || '').join(', '), 
+                `৳${sale.total || 0}`, 
+                sale.soldBy || 'N/A'
             ]);
             
             doc.autoTable({ 
@@ -1917,7 +2008,7 @@
             }
             
             const filtered = sales.filter(s => 
-                s.items && s.items.some(item => item.serial && item.serial.toLowerCase().includes(sn.toLowerCase()))
+                (s.items || []).some(item => item.serial && item.serial.toLowerCase().includes(sn.toLowerCase()))
             );
             
             displayReport(filtered, `সিরিয়াল নম্বর: ${sn}`);
@@ -1959,16 +2050,16 @@
                 html += `
                     <tr>
                         <td>${sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A'}</td>
-                        <td>${sale.invoiceNo}</td>
-                        <td>${sale.customer}</td>
-                        <td>${sale.items.map(i => `${i.name} (x${i.qty})`).join(', ')}</td>
-                        <td>৳${sale.total}</td>
-                        <td>${sale.soldBy}</td>
+                        <td>${sale.invoiceNo || 'N/A'}</td>
+                        <td>${sale.customer || 'N/A'}</td>
+                        <td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join(', ')}</td>
+                        <td>৳${sale.total || 0}</td>
+                        <td>${sale.soldBy || 'N/A'}</td>
                     </tr>
                 `;
             });
             
-            const totalAmount = data.reduce((sum, s) => sum + s.total, 0);
+            const totalAmount = data.reduce((sum, s) => sum + (s.total || 0), 0);
             html += `
                                 </tbody>
                                 <tfoot class="table-dark">
@@ -1997,11 +2088,11 @@
             
             const tableData = window.currentReportData.map(sale => [
                 sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A',
-                sale.invoiceNo,
-                sale.customer,
-                sale.items.map(i => i.name).join(', '),
-                `${sale.total}`,
-                sale.soldBy
+                sale.invoiceNo || 'N/A',
+                sale.customer || 'N/A',
+                (sale.items || []).map(i => i.name || '').join(', '),
+                `${sale.total || 0}`,
+                sale.soldBy || 'N/A'
             ]);
             
             doc.autoTable({
@@ -2023,14 +2114,14 @@
                 const u = doc.data();
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${u.name}</td>
-                    <td>${u.email}</td>
-                    <td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-info'}">${u.role}</span></td>
+                    <td>${u.name || 'N/A'}</td>
+                    <td>${u.email || 'N/A'}</td>
+                    <td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-info'}">${u.role || 'user'}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-warning me-1" onclick="openEditUser('${doc.id}', '${u.name}', '${u.email}', '${u.role}')">
+                        <button class="btn btn-sm btn-warning me-1" onclick="openEditUser('${doc.id}', '${u.name || ''}', '${u.email || ''}', '${u.role || 'user'}')">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name}')">
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name || ''}')">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
@@ -2109,11 +2200,11 @@
                 serial: document.getElementById('pSerial').value,
                 barcode: document.getElementById('pBarcode').value,
                 name: document.getElementById('pName').value,
-                buyPrice: Number(document.getElementById('pBuy').value),
-                salePrice: Number(document.getElementById('pSell').value),
-                qty: Number(document.getElementById('pQty').value),
+                buyPrice: Number(document.getElementById('pBuy').value) || 0,
+                salePrice: Number(document.getElementById('pSell').value) || 0,
+                qty: Number(document.getElementById('pQty').value) || 0,
                 warranty: Number(document.getElementById('pWarranty').value) || 0,
-                addedBy: user.name,
+                addedBy: user.name || 'Unknown',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             
@@ -2134,8 +2225,8 @@
             if (newName && newPrice && newQty) {
                 await db.collection('products').doc(id).update({
                     name: newName,
-                    salePrice: Number(newPrice),
-                    qty: Number(newQty)
+                    salePrice: Number(newPrice) || 0,
+                    qty: Number(newQty) || 0
                 });
                 await loadProducts();
                 setTimeout(() => updateCharts(), 500);
@@ -2239,17 +2330,12 @@
                         const data = JSON.parse(event.target.result);
                         
                         if (confirm('এটি বর্তমান ডাটা মুছে নতুন ডাটা লোড করবে। আপনি কি নিশ্চিত?')) {
-                            // Restore products
                             for (const product of data.products) {
                                 await db.collection('products').add(product);
                             }
-                            
-                            // Restore sales
                             for (const sale of data.sales) {
                                 await db.collection('sales').add(sale);
                             }
-                            
-                            // Restore customers
                             for (const customer of data.customers) {
                                 await db.collection('customers').doc(customer.phone).set(customer);
                             }
@@ -2267,7 +2353,6 @@
             input.click();
         }
 
-        // Add backup/restore buttons to navbar
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.querySelector('.navbar-custom .container-fluid');
             const backupBtn = document.createElement('button');
