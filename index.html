@@ -5,20 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amin Computer - Store Management</title>
     
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <!-- Barcode Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <style>
@@ -135,9 +129,7 @@
             color: #333;
         }
 
-        .product-card:hover {
-            transform: translateY(-3px);
-        }
+        .product-card:hover { transform: translateY(-3px); }
 
         .product-card h6 {
             color: #2c3e50;
@@ -221,7 +213,6 @@
             font-weight: bold;
         }
 
-        /* A4 Invoice Box */
         .invoice-box {
             background: white;
             width: 210mm;
@@ -293,10 +284,7 @@
                 box-shadow: none;
             }
             .no-print { display: none !important; }
-            @page {
-                size: A4;
-                margin: 0;
-            }
+            @page { size: A4; margin: 0; }
         }
 
         .tab-content {
@@ -333,9 +321,7 @@
             margin: 0 auto;
         }
 
-        #reader {
-            width: 100%;
-        }
+        #reader { width: 100%; }
 
         .theme-toggle {
             position: fixed;
@@ -351,28 +337,72 @@
             z-index: 1000;
         }
 
-        .modal-dialog.modal-lg-custom {
-            max-width: 900px;
+        .modal-dialog.modal-lg-custom { max-width: 900px; }
+
+        /* FIXED: Modal labels and form elements now visible */
+        .modal-content {
+            color: #212529 !important;
+        }
+
+        .modal-body {
+            color: #212529 !important;
+        }
+
+        .modal-body .form-label,
+        .modal-body label,
+        .modal-header .modal-title {
+            color: #212529 !important;
+        }
+
+        .modal-body .form-control,
+        .modal-body .form-select {
+            color: #212529 !important;
+            background-color: #fff !important;
+        }
+
+        .modal-body .form-control::placeholder {
+            color: #6c757d !important;
+        }
+
+        .modal-body hr {
+            border-color: #dee2e6 !important;
+        }
+
+        .modal-body h4,
+        .modal-body h5 {
+            color: #212529 !important;
+        }
+
+        .modal-body .table {
+            color: #212529 !important;
+        }
+
+        .modal-body .table thead {
+            color: #212529 !important;
+        }
+
+        .modal-body .table th {
+            color: #212529 !important;
+        }
+
+        .modal-body .table td {
+            color: #212529 !important;
         }
     </style>
 </head>
 <body>
 
-    <!-- Loading Spinner -->
     <div class="loading-spinner" id="loadingSpinner">
         <div class="spinner-border text-light" style="width: 3rem; height: 3rem;"></div>
     </div>
 
-    <!-- Notifications -->
     <div class="notification" id="notificationArea"></div>
 
-    <!-- 3D Header -->
     <div class="header-3d">
         <h1><i class="fa-solid fa-microchip me-3"></i>AMIN COMPUTER</h1>
         <p>Store Management & POS System</p>
     </div>
 
-    <!-- LOGIN PAGE -->
     <div class="login-container" id="loginPage">
         <div class="login-box">
             <div class="text-center mb-4">
@@ -391,9 +421,7 @@
         </div>
     </div>
 
-    <!-- MAIN APP -->
     <div class="main-app" id="mainApp">
-        <!-- Navbar -->
         <nav class="navbar navbar-dark navbar-custom">
             <div class="container-fluid">
                 <span class="navbar-brand fs-5"><i class="fa-solid fa-store me-2"></i>Amin Computer</span>
@@ -416,7 +444,6 @@
         </nav>
 
         <div class="container-fluid px-3">
-            <!-- Tabs -->
             <ul class="nav nav-tabs mb-4" id="mainTabs">
                 <li class="nav-item">
                     <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dashboard">
@@ -451,7 +478,6 @@
             </ul>
 
             <div class="tab-content">
-                <!-- Dashboard Tab -->
                 <div class="tab-pane fade show active" id="dashboard">
                     <div class="row">
                         <div class="col-md-6">
@@ -470,7 +496,7 @@
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <div class="chart-container">
-                                <h5 class="mb-3"><i class="fa-solid fa-calendar-alt me-2"></i><span data-lang="sales_trend">বিক্রয় ট্রেন্ড (৩০ দিন)</span></h5>
+                                <h5 class="mb-3"><i class="fa-solid fa-calendar-alt me-2"></i><span data-lang="sales_trend">বিক্রয় ট্রেন্ড (০ দিন)</span></h5>
                                 <canvas id="salesTrendChart"></canvas>
                             </div>
                         </div>
@@ -485,11 +511,10 @@
                     </div>
                 </div>
 
-                <!-- Products Tab -->
                 <div class="tab-pane fade" id="products">
                     <div class="row mb-3">
                         <div class="col-md-8">
-                            <input type="text" id="searchProduct" class="form-control form-control-lg" placeholder="🔍 প্রোডাক্ট সার্চ (নাম/SKU/Serial Number)...">
+                            <input type="text" id="searchProduct" class="form-control form-control-lg" placeholder=" প্রোডাক্ট সার্চ (নাম/SKU/Serial Number)...">
                         </div>
                         <div class="col-md-4 text-end">
                             <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addProductModal" id="btnAddProduct">
@@ -500,7 +525,6 @@
                     <div class="row" id="productsList"></div>
                 </div>
 
-                <!-- Sales Tab -->
                 <div class="tab-pane fade" id="sales">
                     <div class="card border-0 shadow">
                         <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
@@ -530,7 +554,6 @@
                     </div>
                 </div>
 
-                <!-- Customers Tab -->
                 <div class="tab-pane fade" id="customers">
                     <div class="card border-0 shadow">
                         <div class="card-header bg-primary text-white">
@@ -555,7 +578,6 @@
                     </div>
                 </div>
 
-                <!-- Reports Tab -->
                 <div class="tab-pane fade" id="reports">
                     <div class="row mb-4">
                         <div class="col-md-4">
@@ -590,7 +612,6 @@
                     <div id="reportResults"></div>
                 </div>
 
-                <!-- User Management Tab -->
                 <div class="tab-pane fade" id="userManagement">
                     <div class="card border-0 shadow">
                         <div class="card-header d-flex justify-content-between align-items-center bg-light">
@@ -622,7 +643,6 @@
         </div>
     </div>
 
-    <!-- CART MODAL -->
     <div class="modal fade" id="cartModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -646,7 +666,7 @@
                         </table>
                     </div>
                     <div class="text-end mb-3">
-                        <h4><span data-lang="total_bill">সর্বমোট বিল</span>: ৳ <span id="cartTotal">0</span></h4>
+                        <h4><span data-lang="total_bill">সর্বমোট বিল</span>:  <span id="cartTotal">0</span></h4>
                     </div>
                     <hr>
                     <div class="row">
@@ -667,7 +687,6 @@
         </div>
     </div>
 
-    <!-- INVOICE/CHALAN MODAL -->
     <div class="modal fade" id="invoiceModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-lg-custom">
             <div class="modal-content">
@@ -769,7 +788,6 @@
         </div>
     </div>
 
-    <!-- ADD PRODUCT MODAL -->
     <div class="modal fade" id="addProductModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -820,7 +838,6 @@
         </div>
     </div>
 
-    <!-- BARCODE SCANNER MODAL -->
     <div class="modal fade" id="barcodeModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -840,7 +857,6 @@
         </div>
     </div>
 
-    <!-- ADD/EDIT USER MODALS -->
     <div class="modal fade" id="addUserModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -908,12 +924,10 @@
         </div>
     </div>
 
-    <!-- Theme Toggle -->
     <button class="btn btn-dark theme-toggle" onclick="toggleTheme()" title="ডার্ক মোড">
         <i class="fa-solid fa-moon"></i>
     </button>
 
-    <!-- Language Toggle -->
     <button class="btn btn-primary lang-toggle" onclick="toggleLanguage()" title="ভাষা পরিবর্তন">
         <i class="fa-solid fa-language"></i> <span id="langLabel">EN</span>
     </button>
@@ -921,7 +935,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDAMFoDnclCwBSmwvetfxfbi7vXDAClFsc",
             authDomain: "warrior-f4d52.firebaseapp.com",
@@ -948,127 +961,58 @@
         let html5QrCode;
         let currentLang = 'bn';
 
-        // Translations
         const translations = {
             bn: {
-                dashboard: 'ড্যাশবোর্ড',
-                products: 'প্রোডাক্টস',
-                sales: 'সেলস',
-                customers: 'কাস্টমার',
-                reports: 'রিপোর্ট',
-                users: 'ইউজার',
-                stock_status: 'স্টক অবস্থা',
-                sales_analysis: 'বিক্রয় বিশ্লেষণ',
-                sales_trend: 'বিক্রয় ট্রেন্ড (৩০ দিন)',
-                profit_loss: 'লাভ/ক্ষতি রিপোর্ট',
-                new_product: 'নতুন প্রোডাক্ট',
-                sales_record: 'সেলস রেকর্ড',
-                customer_database: 'কাস্টমার ডাটাবেস',
-                by_date: 'তারিখ অনুযায়ী',
-                by_user: 'ইউজার অনুযায়ী',
-                serial_number: 'সিরিয়াল নম্বর',
-                show_report: 'রিপোর্ট দেখুন',
-                search: 'খুঁজুন',
-                user_management: 'ইউজার ম্যানেজমেন্ট',
-                new_user: 'নতুন ইউজার',
-                user_note: 'নোট: নতুন ইউজার তৈরি করলে অটোমেটিক লগআউট হয়ে যাবে। আবার লগইন করুন।',
-                name: 'নাম',
-                phone: 'ফোন',
-                total_purchases: 'মোট কেনাকাটা',
-                last_purchase: 'শেষ কেনাকাটা',
-                action: 'অ্যাকশন',
-                email: 'ইমেইল',
-                role: 'রোল',
-                sell_multiple: 'একসাথে একাধিক প্রোডাক্ট বিক্রয়',
-                product: 'প্রোডাক্ট',
-                price: 'দাম',
-                quantity: 'পরিমাণ',
-                total: 'মোট',
-                delete: 'মুছুন',
-                total_bill: 'সর্বমোট বিল',
-                customer_name: 'কাস্টমারের নাম',
-                mobile_number: 'মোবাইল নম্বর',
-                confirm_sale: 'বিক্রয় নিশ্চিত করুন ও ইনভয়েস তৈরি করুন',
-                print_preview: 'প্রিন্ট প্রিভিউ (A4 Size)',
-                close: 'বন্ধ',
-                print: 'প্রিন্ট',
-                save: 'সেভ করুন',
-                create: 'তৈরি করুন',
-                edit_user: 'ইউজার এডিট',
-                update: 'আপডেট',
-                password: 'পাসওয়ার্ড',
-                date: 'তারিখ',
-                invoice_no: 'ইনভয়েস নং',
-                customer: 'কাস্টমার',
-                items: 'আইটেম',
-                seller: 'বিক্রেতা'
+                dashboard: 'ড্যাশবোর্ড', products: 'প্রোডাক্টস', sales: 'সেলস', customers: 'কাস্টমার',
+                reports: 'রিপোর্ট', users: 'ইউজার', stock_status: 'স্টক অবস্থা',
+                sales_analysis: 'বিক্রয় বিশ্লেষণ', sales_trend: 'বিক্রয় ট্রেন্ড (৩০ দিন)',
+                profit_loss: 'লাভ/ক্ষতি রিপোর্ট', new_product: 'নতুন প্রোডাক্ট',
+                sales_record: 'সেলস রেকর্ড', customer_database: 'কাস্টমার ডাটাবেস',
+                by_date: 'তারিখ অনুযায়ী', by_user: 'ইউজার অনুযায়ী', serial_number: 'সিরিয়াল নম্বর',
+                show_report: 'রিপোর্ট দেখুন', search: 'খুঁজুন', user_management: 'ইউজার ম্যানেজমেন্ট',
+                new_user: 'নতুন ইউজার', user_note: 'নোট: নতুন ইউজার তৈরি করলে অটোমেটিক লগআউট হয়ে যাবে। আবার লগইন করুন।',
+                name: 'নাম', phone: 'ফোন', total_purchases: 'মোট কেনাকাটা', last_purchase: 'শেষ কেনাকাটা',
+                action: 'অ্যাকশন', email: 'ইমেইল', role: 'রোল',
+                sell_multiple: 'একসাথে একাধিক প্রোডাক্ট বিক্রয়', product: 'প্রোডাক্ট',
+                price: 'দাম', quantity: 'পরিমাণ', total: 'মোট', delete: 'মুছুন',
+                total_bill: 'সর্বমোট বিল', customer_name: 'কাস্টমারের নাম',
+                mobile_number: 'মোবাইল নম্বর', confirm_sale: 'বিক্রয় নিশ্চিত করুন ও ইনভয়েস তৈরি করুন',
+                print_preview: 'প্রিন্ট প্রিভিউ (A4 Size)', close: 'বন্ধ', print: 'প্রিন্ট',
+                save: 'সেভ করুন', create: 'তৈরি করুন', edit_user: 'ইউজার এডিট',
+                update: 'আপডেট', password: 'পাসওয়ার্ড', date: 'তারিখ',
+                invoice_no: 'ইনভয়েস নং', customer: 'কাস্টমার', items: 'আইটেম', seller: 'বিক্রেতা'
             },
             en: {
-                dashboard: 'Dashboard',
-                products: 'Products',
-                sales: 'Sales',
-                customers: 'Customers',
-                reports: 'Reports',
-                users: 'Users',
-                stock_status: 'Stock Status',
-                sales_analysis: 'Sales Analysis',
-                sales_trend: 'Sales Trend (30 days)',
-                profit_loss: 'Profit/Loss Report',
-                new_product: 'New Product',
-                sales_record: 'Sales Record',
-                customer_database: 'Customer Database',
-                by_date: 'By Date',
-                by_user: 'By User',
-                serial_number: 'Serial Number',
-                show_report: 'Show Report',
-                search: 'Search',
-                user_management: 'User Management',
-                new_user: 'New User',
-                user_note: 'Note: Creating a new user will automatically logout. Please login again.',
-                name: 'Name',
-                phone: 'Phone',
-                total_purchases: 'Total Purchases',
-                last_purchase: 'Last Purchase',
-                action: 'Action',
-                email: 'Email',
-                role: 'Role',
-                sell_multiple: 'Sell Multiple Products',
-                product: 'Product',
-                price: 'Price',
-                quantity: 'Quantity',
-                total: 'Total',
-                delete: 'Delete',
-                total_bill: 'Total Bill',
-                customer_name: 'Customer Name',
-                mobile_number: 'Mobile Number',
-                confirm_sale: 'Confirm Sale & Create Invoice',
-                print_preview: 'Print Preview (A4 Size)',
-                close: 'Close',
-                print: 'Print',
-                save: 'Save',
-                create: 'Create',
-                edit_user: 'Edit User',
-                update: 'Update',
-                password: 'Password',
-                date: 'Date',
-                invoice_no: 'Invoice No',
-                customer: 'Customer',
-                items: 'Items',
-                seller: 'Seller'
+                dashboard: 'Dashboard', products: 'Products', sales: 'Sales', customers: 'Customers',
+                reports: 'Reports', users: 'Users', stock_status: 'Stock Status',
+                sales_analysis: 'Sales Analysis', sales_trend: 'Sales Trend (30 days)',
+                profit_loss: 'Profit/Loss Report', new_product: 'New Product',
+                sales_record: 'Sales Record', customer_database: 'Customer Database',
+                by_date: 'By Date', by_user: 'By User', serial_number: 'Serial Number',
+                show_report: 'Show Report', search: 'Search', user_management: 'User Management',
+                new_user: 'New User', user_note: 'Note: Creating a new user will automatically logout. Please login again.',
+                name: 'Name', phone: 'Phone', total_purchases: 'Total Purchases', last_purchase: 'Last Purchase',
+                action: 'Action', email: 'Email', role: 'Role',
+                sell_multiple: 'Sell Multiple Products', product: 'Product',
+                price: 'Price', quantity: 'Quantity', total: 'Total', delete: 'Delete',
+                total_bill: 'Total Bill', customer_name: 'Customer Name',
+                mobile_number: 'Mobile Number', confirm_sale: 'Confirm Sale & Create Invoice',
+                print_preview: 'Print Preview (A4 Size)', close: 'Close', print: 'Print',
+                save: 'Save', create: 'Create', edit_user: 'Edit User',
+                update: 'Update', password: 'Password', date: 'Date',
+                invoice_no: 'Invoice No', customer: 'Customer', items: 'Items', seller: 'Seller'
             }
         };
 
         function toggleLanguage() {
             currentLang = currentLang === 'bn' ? 'en' : 'bn';
             document.getElementById('langLabel').textContent = currentLang.toUpperCase();
-            
             document.querySelectorAll('[data-lang]').forEach(el => {
                 const key = el.getAttribute('data-lang');
                 if (translations[currentLang][key]) {
                     el.textContent = translations[currentLang][key];
                 }
             });
-            
             localStorage.setItem('language', currentLang);
         }
 
@@ -1079,76 +1023,41 @@
             localStorage.setItem('theme', newTheme);
         }
 
-        // FIXED: Number to Words - Properly working
         function numberToWords(num) {
             if (num === 0) return 'Zero Taka Only';
-            
             const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
                          'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
             const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
             
             function convertHundreds(n) {
                 let result = '';
-                if (n >= 100) {
-                    result += ones[Math.floor(n / 100)] + ' Hundred ';
-                    n = n % 100;
-                }
-                if (n >= 20) {
-                    result += tens[Math.floor(n / 10)] + ' ';
-                    n = n % 10;
-                }
-                if (n > 0) {
-                    result += ones[n] + ' ';
-                }
+                if (n >= 100) { result += ones[Math.floor(n / 100)] + ' Hundred '; n = n % 100; }
+                if (n >= 20) { result += tens[Math.floor(n / 10)] + ' '; n = n % 10; }
+                if (n > 0) { result += ones[n] + ' '; }
                 return result.trim();
             }
             
-            // Handle decimal
             const numStr = num.toString();
             let intPart = Math.floor(num);
             let decPart = 0;
-            
             if (numStr.includes('.')) {
                 const decimals = numStr.split('.')[1];
                 decPart = parseInt(decimals.substring(0, 2).padEnd(2, '0'));
             }
             
             let result = '';
-            
-            if (intPart === 0) {
-                result = 'Zero';
-            } else {
-                // Crore
-                if (intPart >= 10000000) {
-                    result += convertHundreds(Math.floor(intPart / 10000000)) + ' Crore ';
-                    intPart = intPart % 10000000;
-                }
-                // Lakh
-                if (intPart >= 100000) {
-                    result += convertHundreds(Math.floor(intPart / 100000)) + ' Lakh ';
-                    intPart = intPart % 100000;
-                }
-                // Thousand
-                if (intPart >= 1000) {
-                    result += convertHundreds(Math.floor(intPart / 1000)) + ' Thousand ';
-                    intPart = intPart % 1000;
-                }
-                // Rest
-                if (intPart > 0) {
-                    result += convertHundreds(intPart);
-                }
+            if (intPart === 0) { result = 'Zero'; }
+            else {
+                if (intPart >= 10000000) { result += convertHundreds(Math.floor(intPart / 10000000)) + ' Crore '; intPart = intPart % 10000000; }
+                if (intPart >= 100000) { result += convertHundreds(Math.floor(intPart / 100000)) + ' Lakh '; intPart = intPart % 100000; }
+                if (intPart >= 1000) { result += convertHundreds(Math.floor(intPart / 1000)) + ' Thousand '; intPart = intPart % 1000; }
+                if (intPart > 0) { result += convertHundreds(intPart); }
             }
-            
             result = result.trim() + ' Taka';
-            
-            if (decPart > 0) {
-                result += ' and ' + convertHundreds(decPart) + ' Paisa';
-            }
-            
+            if (decPart > 0) { result += ' and ' + convertHundreds(decPart) + ' Paisa'; }
             return result + ' Only';
         }
 
-        // Auth Functions
         async function loginUser() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -1156,23 +1065,12 @@
                 const cred = await auth.signInWithEmailAndPassword(email, password);
                 const userDoc = await db.collection('users').doc(cred.user.uid).get();
                 const userData = userDoc.data();
-                
-                localStorage.setItem('user', JSON.stringify({
-                    uid: cred.user.uid,
-                    name: userData.name,
-                    role: userData.role
-                }));
+                localStorage.setItem('user', JSON.stringify({ uid: cred.user.uid, name: userData.name, role: userData.role }));
                 loadApp();
-            } catch (e) {
-                alert('Login failed: ' + e.message);
-            }
+            } catch (e) { alert('Login failed: ' + e.message); }
         }
 
-        function logout() {
-            auth.signOut();
-            localStorage.removeItem('user');
-            location.reload();
-        }
+        function logout() { auth.signOut(); localStorage.removeItem('user'); location.reload(); }
 
         async function loadApp() {
             const user = JSON.parse(localStorage.getItem('user'));
@@ -1181,7 +1079,6 @@
                 document.getElementById('mainApp').style.display = 'none';
                 return;
             }
-
             currentUser = user;
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
@@ -1195,206 +1092,114 @@
                 document.getElementById('navUserManagement').style.display = 'block';
                 await loadUsers();
             }
-
             await loadProducts();
             await loadSales();
             await loadCustomers();
-            
-            // FIXED: Initialize charts after DOM is ready
-            setTimeout(() => {
-                updateCharts();
-            }, 1500);
-            
+            setTimeout(() => { updateCharts(); }, 1500);
             await populateUserReportDropdown();
             checkLowStock();
-            
-            // Load saved preferences
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
-            
             const savedLang = localStorage.getItem('language');
             if (savedLang && savedLang !== currentLang) toggleLanguage();
         }
 
-        // FIXED: Chart Functions - Properly working
         function updateCharts() {
-            // Destroy existing charts first
             if (stockChart) { stockChart.destroy(); stockChart = null; }
             if (salesChart) { salesChart.destroy(); salesChart = null; }
             if (salesTrendChart) { salesTrendChart.destroy(); salesTrendChart = null; }
             if (profitLossChart) { profitLossChart.destroy(); profitLossChart = null; }
 
-            // Stock Chart
             const stockCanvas = document.getElementById('stockChart');
             if (stockCanvas && products.length > 0) {
-                const ctx = stockCanvas.getContext('2d');
-                stockChart = new Chart(ctx, {
+                stockChart = new Chart(stockCanvas.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels: products.map(p => p.name.substring(0, 15)),
-                        datasets: [{
-                            label: 'Stock Quantity',
-                            data: products.map(p => p.qty || 0),
-                            backgroundColor: products.map(p => (p.qty || 0) <= 5 ? '#dc3545' : '#28a745')
-                        }]
+                        datasets: [{ label: 'Stock Quantity', data: products.map(p => p.qty || 0), backgroundColor: products.map(p => (p.qty || 0) <= 5 ? '#dc3545' : '#28a745') }]
                     },
-                    options: { 
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
                 });
             }
 
-            // Sales Chart
             const salesCanvas = document.getElementById('salesChart');
             if (salesCanvas && sales.length > 0) {
                 const salesByProduct = {};
                 sales.forEach(s => {
                     if (s.items && Array.isArray(s.items)) {
-                        s.items.forEach(item => {
-                            const name = item.name || 'Unknown';
-                            salesByProduct[name] = (salesByProduct[name] || 0) + (item.qty || 0);
-                        });
+                        s.items.forEach(item => { salesByProduct[item.name] = (salesByProduct[item.name] || 0) + (item.qty || 0); });
                     }
                 });
-                
                 const labels = Object.keys(salesByProduct).map(n => n.substring(0, 15));
                 const data = Object.values(salesByProduct);
-                
                 if (labels.length > 0) {
-                    const ctx = salesCanvas.getContext('2d');
-                    salesChart = new Chart(ctx, {
+                    salesChart = new Chart(salesCanvas.getContext('2d'), {
                         type: 'doughnut',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                data: data,
-                                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#feca57', '#ff6b6b']
-                            }]
-                        },
+                        data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#feca57', '#ff6b6b'] }] },
                         options: { responsive: true, maintainAspectRatio: false }
                     });
                 }
             }
 
-            // Sales Trend (Last 30 days)
             const trendCanvas = document.getElementById('salesTrendChart');
             if (trendCanvas) {
                 const last30Days = [];
                 const salesData = [];
                 for (let i = 29; i >= 0; i--) {
-                    const d = new Date();
-                    d.setDate(d.getDate() - i);
+                    const d = new Date(); d.setDate(d.getDate() - i);
                     const dateStr = d.toLocaleDateString('en-GB');
                     last30Days.push(dateStr);
-                    
                     const daySales = sales.filter(s => {
                         if (!s.createdAt) return false;
                         const sDate = s.createdAt.toDate ? s.createdAt.toDate().toLocaleDateString('en-GB') : '';
                         return sDate === dateStr;
                     }).reduce((sum, s) => sum + (s.total || 0), 0);
-                    
                     salesData.push(daySales);
                 }
-                
-                const ctx = trendCanvas.getContext('2d');
-                salesTrendChart = new Chart(ctx, {
+                salesTrendChart = new Chart(trendCanvas.getContext('2d'), {
                     type: 'line',
-                    data: {
-                        labels: last30Days,
-                        datasets: [{
-                            label: 'Sales (৳)',
-                            data: salesData,
-                            borderColor: '#667eea',
-                            fill: true,
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            tension: 0.4
-                        }]
-                    },
-                    options: { 
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } }
-                    }
+                    data: { labels: last30Days, datasets: [{ label: 'Sales (৳)', data: salesData, borderColor: '#667eea', fill: true, backgroundColor: 'rgba(102, 126, 234, 0.1)', tension: 0.4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
                 });
             }
 
-            // Profit/Loss Chart
             const profitCanvas = document.getElementById('profitLossChart');
             if (profitCanvas && currentUser && currentUser.role === 'admin' && products.length > 0) {
-                const profitData = [];
-                const lossData = [];
-                const labels = [];
-                
+                const profitData = [], lossData = [], labels = [];
                 products.forEach(p => {
                     const sold = sales.reduce((sum, s) => {
                         if (!s.items || !Array.isArray(s.items)) return sum;
                         const item = s.items.find(i => i.id === p.id);
                         return sum + (item ? (item.qty || 0) : 0);
                     }, 0);
-                    
                     const profit = ((p.salePrice || 0) - (p.buyPrice || 0)) * sold;
                     labels.push(p.name.substring(0, 15));
                     profitData.push(profit > 0 ? profit : 0);
                     lossData.push(profit < 0 ? Math.abs(profit) : 0);
                 });
-                
-                const ctx = profitCanvas.getContext('2d');
-                profitLossChart = new Chart(ctx, {
+                profitLossChart = new Chart(profitCanvas.getContext('2d'), {
                     type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Profit',
-                                data: profitData,
-                                backgroundColor: '#28a745'
-                            },
-                            {
-                                label: 'Loss',
-                                data: lossData,
-                                backgroundColor: '#dc3545'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { 
-                            x: { stacked: true },
-                            y: { beginAtZero: true, stacked: true }
-                        }
-                    }
+                    data: { labels: labels, datasets: [{ label: 'Profit', data: profitData, backgroundColor: '#28a745' }, { label: 'Loss', data: lossData, backgroundColor: '#dc3545' }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { beginAtZero: true, stacked: true } } }
                 });
             }
         }
 
-        // Low Stock Alert
         function checkLowStock() {
             const lowStockProducts = products.filter(p => (p.qty || 0) <= 5);
             if (lowStockProducts.length > 0) {
                 const notificationArea = document.getElementById('notificationArea');
                 notificationArea.innerHTML = '';
-                
                 lowStockProducts.forEach(p => {
                     const alert = document.createElement('div');
                     alert.className = 'low-stock-alert';
-                    alert.innerHTML = `
-                        <i class="fa-solid fa-exclamation-triangle me-2"></i>
-                        <strong>Low Stock:</strong> ${p.name} - Only ${p.qty} left!
-                        <button class="btn btn-sm btn-light ms-2" onclick="this.parentElement.remove()">×</button>
-                    `;
+                    alert.innerHTML = `<i class="fa-solid fa-exclamation-triangle me-2"></i><strong>Low Stock:</strong> ${p.name} - Only ${p.qty} left!<button class="btn btn-sm btn-light ms-2" onclick="this.parentElement.remove()">×</button>`;
                     notificationArea.appendChild(alert);
                 });
-                
-                setTimeout(() => {
-                    notificationArea.innerHTML = '';
-                }, 10000);
+                setTimeout(() => { notificationArea.innerHTML = ''; }, 10000);
             }
         }
 
-        // Product Functions
         async function loadProducts() {
             const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
             products = [];
@@ -1406,53 +1211,14 @@
             const container = document.getElementById('productsList');
             const search = document.getElementById('searchProduct').value.toLowerCase();
             container.innerHTML = '';
-            
             const isAdmin = currentUser && currentUser.role === 'admin';
-            
-            products.filter(p => 
-                (p.name || '').toLowerCase().includes(search) || 
-                (p.sku || '').toLowerCase().includes(search) ||
-                (p.serial && p.serial.toLowerCase().includes(search)) ||
-                (p.barcode && p.barcode.includes(search))
-            ).forEach(product => {
+            products.filter(p => (p.name || '').toLowerCase().includes(search) || (p.sku || '').toLowerCase().includes(search) || (p.serial && p.serial.toLowerCase().includes(search)) || (p.barcode && p.barcode.includes(search)))
+            .forEach(product => {
                 const div = document.createElement('div');
                 div.className = 'col-md-4 col-lg-3';
-                
-                const buyPriceHTML = isAdmin ? `
-                    <div class="buy-price hidden-price" onclick="toggleBuyPrice(this)" data-price="${product.buyPrice || 0}">
-                        Buy: ৳****
-                    </div>
-                ` : '<div class="text-muted">Buy: N/A</div>';
-                
-                const warrantyHTML = product.warranty ? 
-                    `<span class="warranty-badge"><i class="fa-solid fa-shield-alt me-1"></i>${product.warranty} মাস</span>` : '';
-                
-                div.innerHTML = `
-                    <div class="product-card">
-                        <h6>${product.name || 'Unknown'} ${warrantyHTML}</h6>
-                        <div class="product-sku">SKU: ${product.sku || 'N/A'}</div>
-                        ${product.serial ? `<div class="product-sku">SN: ${product.serial}</div>` : ''}
-                        ${product.barcode ? `<div class="product-sku"><i class="fa-solid fa-barcode me-1"></i>${product.barcode}</div>` : ''}
-                        <div class="price-box">
-                            ${buyPriceHTML}
-                            <div class="sell-price">Sell: ৳${product.salePrice || 0}</div>
-                        </div>
-                        <div class="stock-badge ${(product.qty || 0) <= 5 ? 'bg-danger' : 'bg-success'}">
-                            <i class="fa-solid fa-box me-1"></i>Stock: ${product.qty || 0}
-                        </div>
-                        <button class="btn btn-primary w-100 mt-2" onclick="addToCart('${product.id}')" ${(product.qty || 0) <= 0 ? 'disabled' : ''}>
-                            <i class="fa-solid fa-cart-plus me-1"></i>Add to Cart
-                        </button>
-                        ${isAdmin ? `
-                            <button class="btn btn-warning w-100 mt-2 btn-sm" onclick="editProduct('${product.id}')">
-                                <i class="fa-solid fa-edit me-1"></i>Edit
-                            </button>
-                            <button class="btn btn-danger w-100 mt-2 btn-sm" onclick="deleteProduct('${product.id}')">
-                                <i class="fa-solid fa-trash me-1"></i>Delete
-                            </button>
-                        ` : ''}
-                    </div>
-                `;
+                const buyPriceHTML = isAdmin ? `<div class="buy-price hidden-price" onclick="toggleBuyPrice(this)" data-price="${product.buyPrice || 0}">Buy: ৳****</div>` : '<div class="text-muted">Buy: N/A</div>';
+                const warrantyHTML = product.warranty ? `<span class="warranty-badge"><i class="fa-solid fa-shield-alt me-1"></i>${product.warranty} মাস</span>` : '';
+                div.innerHTML = `<div class="product-card"><h6>${product.name || 'Unknown'} ${warrantyHTML}</h6><div class="product-sku">SKU: ${product.sku || 'N/A'}</div>${product.serial ? `<div class="product-sku">SN: ${product.serial}</div>` : ''}${product.barcode ? `<div class="product-sku"><i class="fa-solid fa-barcode me-1"></i>${product.barcode}</div>` : ''}<div class="price-box">${buyPriceHTML}<div class="sell-price">Sell: ৳${product.salePrice || 0}</div></div><div class="stock-badge ${(product.qty || 0) <= 5 ? 'bg-danger' : 'bg-success'}"><i class="fa-solid fa-box me-1"></i>Stock: ${product.qty || 0}</div><button class="btn btn-primary w-100 mt-2" onclick="addToCart('${product.id}')" ${(product.qty || 0) <= 0 ? 'disabled' : ''}><i class="fa-solid fa-cart-plus me-1"></i>Add to Cart</button>${isAdmin ? `<button class="btn btn-warning w-100 mt-2 btn-sm" onclick="editProduct('${product.id}')"><i class="fa-solid fa-edit me-1"></i>Edit</button><button class="btn btn-danger w-100 mt-2 btn-sm" onclick="deleteProduct('${product.id}')"><i class="fa-solid fa-trash me-1"></i>Delete</button>` : ''}</div>`;
                 container.appendChild(div);
             });
         }
@@ -1473,23 +1239,12 @@
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) return;
-            
             const existing = cart.find(c => c.id === productId);
-            
             if (existing) {
                 if (existing.qty < (product.qty || 0)) existing.qty++;
                 else { alert('পর্যাপ্ত স্টক নেই!'); return; }
             } else {
-                cart.push({ 
-                    id: product.id || '',
-                    name: product.name || '',
-                    price: Number(product.salePrice) || 0,
-                    buyPrice: Number(product.buyPrice) || 0,
-                    qty: 1,
-                    maxStock: Number(product.qty) || 0,
-                    serial: product.serial || '',
-                    warranty: Number(product.warranty) || 0
-                });
+                cart.push({ id: product.id || '', name: product.name || '', price: Number(product.salePrice) || 0, buyPrice: Number(product.buyPrice) || 0, qty: 1, maxStock: Number(product.qty) || 0, serial: product.serial || '', warranty: Number(product.warranty) || 0 });
             }
             updateCartCount();
             alert('প্রোডাক্ট কার্টে যোগ হয়েছে!');
@@ -1502,175 +1257,76 @@
 
         function openCart() {
             if (cart.length === 0) { alert('কার্ট খালি!'); return; }
-            
             const tbody = document.getElementById('cartTable');
             tbody.innerHTML = '';
             let total = 0;
-            
             cart.forEach((item, index) => {
                 const itemTotal = (item.price || 0) * (item.qty || 1);
                 total += itemTotal;
-                
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${item.name || 'Unknown'}</td>
-                    <td>৳${item.price || 0}</td>
-                    <td><input type="number" class="form-control form-control-sm" value="${item.qty || 1}" min="1" max="${item.maxStock || 0}" onchange="updateCartQty(${index}, this.value)"></td>
-                    <td>৳${itemTotal}</td>
-                    <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})"><i class="fa-solid fa-times"></i></button></td>
-                `;
+                tr.innerHTML = `<td>${item.name || 'Unknown'}</td><td>৳${item.price || 0}</td><td><input type="number" class="form-control form-control-sm" value="${item.qty || 1}" min="1" max="${item.maxStock || 0}" onchange="updateCartQty(${index}, this.value)"></td><td>${itemTotal}</td><td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})"><i class="fa-solid fa-times"></i></button></td>`;
                 tbody.appendChild(tr);
             });
-            
             document.getElementById('cartTotal').textContent = total;
             new bootstrap.Modal(document.getElementById('cartModal')).show();
         }
 
-        function updateCartQty(index, qty) {
-            cart[index].qty = parseInt(qty) || 1;
-            openCart();
-        }
+        function updateCartQty(index, qty) { cart[index].qty = parseInt(qty) || 1; openCart(); }
+        function removeFromCart(index) { cart.splice(index, 1); updateCartCount(); openCart(); }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartCount();
-            openCart();
-        }
-
-        // FIXED: Sale Functions - No undefined values
         async function confirmSale() {
             const custName = document.getElementById('custName').value.trim();
             const custPhone = document.getElementById('custPhone').value.trim();
-            
-            if (!custName || !custPhone) {
-                alert('অনুগ্রহ করে কাস্টমারের তথ্য দিন!');
-                return;
-            }
-            
-            if (cart.length === 0) {
-                alert('কার্ট খালি!');
-                return;
-            }
-            
+            if (!custName || !custPhone) { alert('অনুগ্রহ করে কাস্টমারের তথ্য দিন!'); return; }
+            if (cart.length === 0) { alert('কার্ট খালি!'); return; }
             const user = JSON.parse(localStorage.getItem('user'));
-            
-            // FIXED: Ensure all values are defined
             const userUid = user.uid || 'unknown';
             const userName = user.name || 'Unknown';
-            
             const invoiceNo = 'INV-' + Date.now().toString().slice(-8);
             const total = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 1)), 0);
             const saleDate = new Date();
-            
-            // FIXED: Clean cart items - remove ALL undefined values
-            const cleanCartItems = cart.map(item => ({
-                id: item.id || '',
-                name: item.name || 'Unknown',
-                price: Number(item.price) || 0,
-                buyPrice: Number(item.buyPrice) || 0,
-                qty: Number(item.qty) || 1,
-                maxStock: Number(item.maxStock) || 0,
-                serial: item.serial || '',
-                warranty: Number(item.warranty) || 0
-            }));
-            
+            const cleanCartItems = cart.map(item => ({ id: item.id || '', name: item.name || 'Unknown', price: Number(item.price) || 0, buyPrice: Number(item.buyPrice) || 0, qty: Number(item.qty) || 1, maxStock: Number(item.maxStock) || 0, serial: item.serial || '', warranty: Number(item.warranty) || 0 }));
             try {
-                // Update stock
                 for (const item of cleanCartItems) {
-                    if (item.id) {
-                        await db.collection('products').doc(item.id).update({
-                            qty: firebase.firestore.FieldValue.increment(-item.qty)
-                        });
-                    }
+                    if (item.id) { await db.collection('products').doc(item.id).update({ qty: firebase.firestore.FieldValue.increment(-item.qty) }); }
                 }
-                
-                // FIXED: Create saleData with NO undefined values
-                const saleData = {
-                    invoiceNo: invoiceNo,
-                    customer: custName,
-                    phone: custPhone,
-                    items: cleanCartItems,
-                    total: Number(total) || 0,
-                    soldBy: userName,
-                    soldByUid: userUid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    saleDate: saleDate.toISOString(),
-                    expiryDate: new Date(saleDate.getFullYear() + 10, saleDate.getMonth(), saleDate.getDate()).toISOString()
-                };
-                
-                // Debug log
+                const saleData = { invoiceNo: invoiceNo, customer: custName, phone: custPhone, items: cleanCartItems, total: Number(total) || 0, soldBy: userName, soldByUid: userUid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), saleDate: saleDate.toISOString(), expiryDate: new Date(saleDate.getFullYear() + 10, saleDate.getMonth(), saleDate.getDate()).toISOString() };
                 console.log('Saving sale data:', saleData);
-                
                 await db.collection('sales').add(saleData);
-                
-                // Save/Update customer
                 await saveCustomer(custName, custPhone, total);
-                
-                // Close cart modal
                 const cartModalEl = document.getElementById('cartModal');
                 const cartModal = bootstrap.Modal.getInstance(cartModalEl);
-                if (cartModal) {
-                    cartModal.hide();
-                }
-                
-                // Wait for modal to fully close, then show invoice
+                if (cartModal) { cartModal.hide(); }
                 cartModalEl.addEventListener('hidden.bs.modal', function handler() {
                     cartModalEl.removeEventListener('hidden.bs.modal', handler);
-                    
                     currentInvoice = saleData;
                     generateInvoice();
-                    
                     const invoiceModal = new bootstrap.Modal(document.getElementById('invoiceModal'));
                     invoiceModal.show();
                 }, { once: true });
-                
-                // Reset cart
                 cart = [];
                 updateCartCount();
                 document.getElementById('custName').value = '';
                 document.getElementById('custPhone').value = '';
-                
-                // Reload data
                 await loadProducts();
                 await loadSales();
                 await loadCustomers();
                 setTimeout(() => updateCharts(), 500);
                 checkLowStock();
-                
-            } catch (error) {
-                console.error('Sale Error:', error);
-                alert('বিক্রয় সম্পন্ন করতে সমস্যা: ' + error.message);
-            }
+            } catch (error) { console.error('Sale Error:', error); alert('বিক্রয় সম্পন্ন করতে সমস্যা: ' + error.message); }
         }
 
-        // Customer Database
         async function saveCustomer(name, phone, amount) {
             if (!phone) return;
-            
             const customerRef = db.collection('customers').doc(phone);
-            
             try {
                 const customerDoc = await customerRef.get();
-                
                 if (customerDoc.exists) {
-                    await customerRef.update({
-                        totalSpent: firebase.firestore.FieldValue.increment(Number(amount) || 0),
-                        purchaseCount: firebase.firestore.FieldValue.increment(1),
-                        lastPurchase: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    await customerRef.update({ totalSpent: firebase.firestore.FieldValue.increment(Number(amount) || 0), purchaseCount: firebase.firestore.FieldValue.increment(1), lastPurchase: firebase.firestore.FieldValue.serverTimestamp() });
                 } else {
-                    await customerRef.set({
-                        name: name || '',
-                        phone: phone || '',
-                        totalSpent: Number(amount) || 0,
-                        purchaseCount: 1,
-                        lastPurchase: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    await customerRef.set({ name: name || '', phone: phone || '', totalSpent: Number(amount) || 0, purchaseCount: 1, lastPurchase: firebase.firestore.FieldValue.serverTimestamp(), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
                 }
-            } catch (error) {
-                console.error('Customer save error:', error);
-            }
+            } catch (error) { console.error('Customer save error:', error); }
         }
 
         async function loadCustomers() {
@@ -1683,22 +1339,11 @@
         function renderCustomers() {
             const tbody = document.getElementById('customersTable');
             if (!tbody) return;
-            
             tbody.innerHTML = '';
             customers.forEach(cust => {
                 const tr = document.createElement('tr');
                 const lastPurchase = cust.lastPurchase?.toDate ? cust.lastPurchase.toDate().toLocaleDateString('bn-BD') : 'N/A';
-                tr.innerHTML = `
-                    <td>${cust.name || 'N/A'}</td>
-                    <td>${cust.phone || 'N/A'}</td>
-                    <td>৳${cust.totalSpent || 0} (${cust.purchaseCount || 0} বার)</td>
-                    <td>${lastPurchase}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewCustomerHistory('${cust.phone}')">
-                            <i class="fa-solid fa-history"></i>
-                        </button>
-                    </td>
-                `;
+                tr.innerHTML = `<td>${cust.name || 'N/A'}</td><td>${cust.phone || 'N/A'}</td><td>৳${cust.totalSpent || 0} (${cust.purchaseCount || 0} বার)</td><td>${lastPurchase}</td><td><button class="btn btn-sm btn-primary" onclick="viewCustomerHistory('${cust.phone}')"><i class="fa-solid fa-history"></i></button></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -1706,104 +1351,45 @@
         async function viewCustomerHistory(phone) {
             const custSales = sales.filter(s => s.phone === phone);
             const container = document.getElementById('reportResults');
-            
-            let html = `
-                <div class="card border-0 shadow mb-3">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">কাস্টমার হিস্ট্রি: ${phone}</h5>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>তারিখ</th>
-                                    <th>ইনভয়েস</th>
-                                    <th>প্রোডাক্ট</th>
-                                    <th>টোটাল</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-            `;
-            
-            custSales.forEach(sale => {
-                html += `
-                    <tr>
-                        <td>${sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A'}</td>
-                        <td>${sale.invoiceNo || 'N/A'}</td>
-                        <td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join(', ')}</td>
-                        <td>৳${sale.total || 0}</td>
-                    </tr>
-                `;
-            });
-            
+            let html = `<div class="card border-0 shadow mb-3"><div class="card-header bg-primary text-white"><h5 class="mb-0">কাস্টমার হিস্ট্রি: ${phone}</h5></div><div class="card-body"><table class="table table-hover"><thead class="table-dark"><tr><th>তারিখ</th><th>ইনভয়েস</th><th>প্রোডাক্ট</th><th>টোটাল</th></tr></thead><tbody>`;
+            custSales.forEach(sale => { html += `<tr><td>${sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A'}</td><td>${sale.invoiceNo || 'N/A'}</td><td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join(', ')}</td><td>৳${sale.total || 0}</td></tr>`; });
             html += '</tbody></table></div></div>';
             container.innerHTML = html;
-            
             const reportsTab = document.querySelector('[data-bs-target="#reports"]');
             if (reportsTab) new bootstrap.Tab(reportsTab).show();
         }
 
         function generateInvoice() {
             if (!currentInvoice) return;
-            
             document.getElementById('invCustomer').value = `${currentInvoice.customer || ''} (${currentInvoice.phone || ''})`;
             document.getElementById('invNumber').value = currentInvoice.invoiceNo || '';
             document.getElementById('invDate').value = new Date().toLocaleDateString('en-GB');
             document.getElementById('invSubject').value = (currentInvoice.items || []).map(i => i.name || '').join(', ');
-            
             const invTbody = document.getElementById('invoiceItems');
             invTbody.innerHTML = '';
             invoiceRowCounter = 0;
-            
-            (currentInvoice.items || []).forEach((item) => {
-                invoiceRowCounter++;
-                invTbody.appendChild(createInvoiceRow(invoiceRowCounter, item.name || '', item.qty || 1, item.price || 0));
-            });
-            
+            (currentInvoice.items || []).forEach((item) => { invoiceRowCounter++; invTbody.appendChild(createInvoiceRow(invoiceRowCounter, item.name || '', item.qty || 1, item.price || 0)); });
             const chalTbody = document.getElementById('chalanItems');
             chalTbody.innerHTML = '';
             chalanRowCounter = 0;
-            
-            (currentInvoice.items || []).forEach((item) => {
-                chalanRowCounter++;
-                chalTbody.appendChild(createChalanRow(chalanRowCounter, item.name || '', item.qty || 1));
-            });
-            
+            (currentInvoice.items || []).forEach((item) => { chalanRowCounter++; chalTbody.appendChild(createChalanRow(chalanRowCounter, item.name || '', item.qty || 1)); });
             calculateInvoiceTotal();
         }
 
         function createInvoiceRow(sl, desc, qty, price) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${String(sl).padStart(2, '0')}</td>
-                <td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none; background:transparent;"></td>
-                <td><input type="number" class="qty-input" value="${qty}" onchange="calculateInvoiceTotal()"></td>
-                <td><input type="number" class="price-input" value="${price}" onchange="calculateInvoiceTotal()"></td>
-                <td class="row-total text-end">${(qty * price).toFixed(2)}</td>
-            `;
+            tr.innerHTML = `<td>${String(sl).padStart(2, '0')}</td><td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none; background:transparent;"></td><td><input type="number" class="qty-input" value="${qty}" onchange="calculateInvoiceTotal()"></td><td><input type="number" class="price-input" value="${price}" onchange="calculateInvoiceTotal()"></td><td class="row-total text-end">${(qty * price).toFixed(2)}</td>`;
             return tr;
         }
 
         function createChalanRow(sl, desc, qty) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${String(sl).padStart(2, '0')}</td>
-                <td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none; background:transparent;"></td>
-                <td><input type="text" class="form-control form-control-sm" value="${qty} pcs" style="border:none; background:transparent;"></td>
-            `;
+            tr.innerHTML = `<td>${String(sl).padStart(2, '0')}</td><td><input type="text" class="form-control form-control-sm" value="${desc}" style="border:none; background:transparent;"></td><td><input type="text" class="form-control form-control-sm" value="${qty} pcs" style="border:none; background:transparent;"></td>`;
             return tr;
         }
 
-        function addInvoiceRow() {
-            invoiceRowCounter++;
-            document.getElementById('invoiceItems').appendChild(createInvoiceRow(invoiceRowCounter, 'New item', 1, 0));
-            calculateInvoiceTotal();
-        }
-
-        function addChalanRow() {
-            chalanRowCounter++;
-            document.getElementById('chalanItems').appendChild(createChalanRow(chalanRowCounter, 'New item', 1));
-        }
+        function addInvoiceRow() { invoiceRowCounter++; document.getElementById('invoiceItems').appendChild(createInvoiceRow(invoiceRowCounter, 'New item', 1, 0)); calculateInvoiceTotal(); }
+        function addChalanRow() { chalanRowCounter++; document.getElementById('chalanItems').appendChild(createChalanRow(chalanRowCounter, 'New item', 1)); }
 
         function calculateInvoiceTotal() {
             const rows = document.querySelectorAll('#invoiceItems tr');
@@ -1812,7 +1398,6 @@
                 const qtyInput = row.querySelector('.qty-input');
                 const priceInput = row.querySelector('.price-input');
                 const totalCell = row.querySelector('.row-total');
-                
                 if (qtyInput && priceInput && totalCell) {
                     const qty = parseFloat(qtyInput.value) || 0;
                     const price = parseFloat(priceInput.value) || 0;
@@ -1822,10 +1407,7 @@
                 }
             });
             document.getElementById('invoiceTotal').textContent = total.toFixed(2);
-            
-            // FIXED: In Words now working properly
-            const inWords = numberToWords(total);
-            document.getElementById('amountInWords').textContent = inWords;
+            document.getElementById('amountInWords').textContent = numberToWords(total);
         }
 
         function switchDocType(type) {
@@ -1853,52 +1435,31 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const title = docType === 'invoice' ? 'INVOICE/BILL' : 'DELIVERY CHALAN';
-            
             const custName = document.getElementById('invCustomer').value;
             const invNo = document.getElementById('invNumber').value;
             const invDate = document.getElementById('invDate').value;
-            
             doc.setFontSize(20);
             doc.text(title, 105, 20, { align: 'center' });
             doc.setFontSize(12);
             doc.text(`To: ${custName}`, 14, 40);
             doc.text(`${docType === 'invoice' ? 'Invoice' : 'Challan'} No: ${invNo}`, 140, 40);
             doc.text(`Date: ${invDate}`, 140, 48);
-            
             if (docType === 'invoice') {
                 const tableData = [];
                 document.querySelectorAll('#invoiceItems tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    tableData.push([
-                        cells[0].textContent, 
-                        cells[1].querySelector('input').value, 
-                        cells[2].querySelector('input').value + ' pcs', 
-                        cells[3].querySelector('input').value, 
-                        cells[4].textContent
-                    ]);
+                    tableData.push([cells[0].textContent, cells[1].querySelector('input').value, cells[2].querySelector('input').value + ' pcs', cells[3].querySelector('input').value, cells[4].textContent]);
                 });
-                doc.autoTable({ 
-                    startY: 60, 
-                    head: [['SL', 'Description', 'Qty', 'Unit Price', 'Total']], 
-                    body: tableData 
-                });
+                doc.autoTable({ startY: 60, head: [['SL', 'Description', 'Qty', 'Unit Price', 'Total']], body: tableData });
                 doc.text(`Total Price: ৳${document.getElementById('invoiceTotal').textContent}`, 140, doc.lastAutoTable.finalY + 10);
                 doc.text(`In Words: ${document.getElementById('amountInWords').textContent}`, 14, doc.lastAutoTable.finalY + 18);
             } else {
                 const tableData = [];
                 document.querySelectorAll('#chalanItems tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    tableData.push([
-                        cells[0].textContent, 
-                        cells[1].querySelector('input').value, 
-                        cells[2].querySelector('input').value
-                    ]);
+                    tableData.push([cells[0].textContent, cells[1].querySelector('input').value, cells[2].querySelector('input').value]);
                 });
-                doc.autoTable({ 
-                    startY: 60, 
-                    head: [['SL', 'Description', 'Qty']], 
-                    body: tableData 
-                });
+                doc.autoTable({ startY: 60, head: [['SL', 'Description', 'Qty']], body: tableData });
             }
             doc.text('Thanking you and assuring you our best services at all times', 14, doc.lastAutoTable.finalY + 20);
             doc.text('Sincerely yours,', 14, doc.lastAutoTable.finalY + 28);
@@ -1911,221 +1472,86 @@
             const snapshot = await db.collection('sales').orderBy('createdAt', 'desc').get();
             sales = [];
             snapshot.forEach(doc => sales.push({ id: doc.id, ...doc.data() }));
-            
             const tbody = document.getElementById('salesTable');
             tbody.innerHTML = '';
-            
             sales.forEach(sale => {
                 const date = sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A';
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${date}</td>
-                    <td><code>${sale.invoiceNo || 'N/A'}</code></td>
-                    <td>${sale.customer || 'N/A'}<br><small class="text-muted">${sale.phone || ''}</small></td>
-                    <td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join('<br>')}</td>
-                    <td class="fw-bold text-success">৳${sale.total || 0}</td>
-                    <td><span class="badge bg-info">${sale.soldBy || 'N/A'}</span></td>
-                    <td><button class="btn btn-sm btn-primary" onclick="viewInvoice('${sale.id}')"><i class="fa-solid fa-eye"></i></button></td>
-                `;
+                tr.innerHTML = `<td>${date}</td><td><code>${sale.invoiceNo || 'N/A'}</code></td><td>${sale.customer || 'N/A'}<br><small class="text-muted">${sale.phone || ''}</small></td><td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join('<br>')}</td><td class="fw-bold text-success">৳${sale.total || 0}</td><td><span class="badge bg-info">${sale.soldBy || 'N/A'}</span></td><td><button class="btn btn-sm btn-primary" onclick="viewInvoice('${sale.id}')"><i class="fa-solid fa-eye"></i></button></td>`;
                 tbody.appendChild(tr);
             });
         }
 
-        async function viewInvoice(saleId) {
-            currentInvoice = sales.find(s => s.id === saleId);
-            generateInvoice();
-            switchDocType('invoice');
-            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
-        }
+        async function viewInvoice(saleId) { currentInvoice = sales.find(s => s.id === saleId); generateInvoice(); switchDocType('invoice'); new bootstrap.Modal(document.getElementById('invoiceModal')).show(); }
 
         function exportSalesPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l');
             doc.setFontSize(16);
             doc.text('Sales Report', 140, 15, { align: 'center' });
-            
-            const tableData = sales.map(sale => [
-                sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A',
-                sale.invoiceNo || 'N/A', 
-                sale.customer || 'N/A', 
-                (sale.items || []).map(i => i.name || '').join(', '), 
-                `৳${sale.total || 0}`, 
-                sale.soldBy || 'N/A'
-            ]);
-            
-            doc.autoTable({ 
-                startY: 25, 
-                head: [['Date', 'Invoice', 'Customer', 'Items', 'Total', 'Sold By']], 
-                body: tableData 
-            });
+            const tableData = sales.map(sale => [sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A', sale.invoiceNo || 'N/A', sale.customer || 'N/A', (sale.items || []).map(i => i.name || '').join(', '), `৳${sale.total || 0}`, sale.soldBy || 'N/A']);
+            doc.autoTable({ startY: 25, head: [['Date', 'Invoice', 'Customer', 'Items', 'Total', 'Sold By']], body: tableData });
             doc.save('sales_report.pdf');
         }
 
-        // Report Functions
         async function populateUserReportDropdown() {
             const usersSnapshot = await db.collection('users').get();
             const select = document.getElementById('reportUser');
             select.innerHTML = '<option value="">সব ইউজার</option>';
-            usersSnapshot.forEach(doc => {
-                const u = doc.data();
-                select.innerHTML += `<option value="${u.name}">${u.name} (${u.role})</option>`;
-            });
+            usersSnapshot.forEach(doc => { const u = doc.data(); select.innerHTML += `<option value="${u.name}">${u.name} (${u.role})</option>`; });
         }
 
         async function generateDateReport() {
             const start = document.getElementById('reportStartDate').value;
             const end = document.getElementById('reportEndDate').value;
-            
-            if (!start || !end) {
-                alert('শুরুর ও শেষের তারিখ দিন');
-                return;
-            }
-            
-            const filtered = sales.filter(s => {
-                if (!s.createdAt) return false;
-                const sDate = s.createdAt.toDate ? s.createdAt.toDate().toISOString().split('T')[0] : '';
-                return sDate >= start && sDate <= end;
-            });
-            
+            if (!start || !end) { alert('শুরুর ও শেষের তারিখ দিন'); return; }
+            const filtered = sales.filter(s => { if (!s.createdAt) return false; const sDate = s.createdAt.toDate ? s.createdAt.toDate().toISOString().split('T')[0] : ''; return sDate >= start && sDate <= end; });
             displayReport(filtered, `তারিখ: ${start} থেকে ${end}`);
         }
 
         async function generateUserReport() {
             const userName = document.getElementById('reportUser').value;
-            
-            const filtered = userName ? 
-                sales.filter(s => s.soldBy === userName) : 
-                sales;
-            
+            const filtered = userName ? sales.filter(s => s.soldBy === userName) : sales;
             displayReport(filtered, userName ? `ইউজার: ${userName}` : 'সব ইউজার');
         }
 
         async function searchBySN() {
             const sn = document.getElementById('searchSN').value.trim();
-            if (!sn) {
-                alert('সিরিয়াল নম্বর দিন');
-                return;
-            }
-            
-            const filtered = sales.filter(s => 
-                (s.items || []).some(item => item.serial && item.serial.toLowerCase().includes(sn.toLowerCase()))
-            );
-            
+            if (!sn) { alert('সিরিয়াল নম্বর দিন'); return; }
+            const filtered = sales.filter(s => (s.items || []).some(item => item.serial && item.serial.toLowerCase().includes(sn.toLowerCase())));
             displayReport(filtered, `সিরিয়াল নম্বর: ${sn}`);
         }
 
         function displayReport(data, title) {
             const container = document.getElementById('reportResults');
-            
-            if (data.length === 0) {
-                container.innerHTML = '<div class="alert alert-warning">কোন তথ্য পাওয়া যায়নি</div>';
-                return;
-            }
-            
-            let html = `
-                <div class="card border-0 shadow mb-3">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between">
-                        <h5 class="mb-0">${title}</h5>
-                        <button class="btn btn-light btn-sm" onclick="downloadReportPDF()">
-                            <i class="fa-solid fa-download me-1"></i>PDF
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>তারিখ</th>
-                                        <th>ইনভয়েস</th>
-                                        <th>কাস্টমার</th>
-                                        <th>প্রোডাক্ট</th>
-                                        <th>টোটাল</th>
-                                        <th>বিক্রেতা</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-            `;
-            
-            data.forEach(sale => {
-                html += `
-                    <tr>
-                        <td>${sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A'}</td>
-                        <td>${sale.invoiceNo || 'N/A'}</td>
-                        <td>${sale.customer || 'N/A'}</td>
-                        <td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join(', ')}</td>
-                        <td>৳${sale.total || 0}</td>
-                        <td>${sale.soldBy || 'N/A'}</td>
-                    </tr>
-                `;
-            });
-            
+            if (data.length === 0) { container.innerHTML = '<div class="alert alert-warning">কোন তথ্য পাওয়া যায়নি</div>'; return; }
+            let html = `<div class="card border-0 shadow mb-3"><div class="card-header bg-primary text-white d-flex justify-content-between"><h5 class="mb-0">${title}</h5><button class="btn btn-light btn-sm" onclick="downloadReportPDF()"><i class="fa-solid fa-download me-1"></i>PDF</button></div><div class="card-body"><div class="table-responsive"><table class="table table-hover"><thead class="table-dark"><tr><th>তারিখ</th><th>ইনভয়েস</th><th>কাস্টমার</th><th>প্রোডাক্ট</th><th>টোটাল</th><th>বিক্রেতা</th></tr></thead><tbody>`;
+            data.forEach(sale => { html += `<tr><td>${sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A'}</td><td>${sale.invoiceNo || 'N/A'}</td><td>${sale.customer || 'N/A'}</td><td>${(sale.items || []).map(i => `${i.name || 'Unknown'} (x${i.qty || 0})`).join(', ')}</td><td>৳${sale.total || 0}</td><td>${sale.soldBy || 'N/A'}</td></tr>`; });
             const totalAmount = data.reduce((sum, s) => sum + (s.total || 0), 0);
-            html += `
-                                </tbody>
-                                <tfoot class="table-dark">
-                                    <tr>
-                                        <td colspan="4" class="text-end"><strong>সর্বমোট:</strong></td>
-                                        <td colspan="2"><strong>৳${totalAmount}</strong></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
+            html += `</tbody><tfoot class="table-dark"><tr><td colspan="4" class="text-end"><strong>সর্বমোট:</strong></td><td colspan="2"><strong>৳${totalAmount}</strong></td></tr></tfoot></table></div></div></div>`;
             container.innerHTML = html;
             window.currentReportData = data;
         }
 
         function downloadReportPDF() {
             if (!window.currentReportData) return;
-            
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l');
             doc.setFontSize(16);
             doc.text('Sales Report', 140, 15, { align: 'center' });
-            
-            const tableData = window.currentReportData.map(sale => [
-                sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A',
-                sale.invoiceNo || 'N/A',
-                sale.customer || 'N/A',
-                (sale.items || []).map(i => i.name || '').join(', '),
-                `${sale.total || 0}`,
-                sale.soldBy || 'N/A'
-            ]);
-            
-            doc.autoTable({
-                startY: 25,
-                head: [['Date', 'Invoice', 'Customer', 'Items', 'Total', 'Sold By']],
-                body: tableData
-            });
-            
+            const tableData = window.currentReportData.map(sale => [sale.createdAt?.toDate ? sale.createdAt.toDate().toLocaleDateString('bn-BD') : 'N/A', sale.invoiceNo || 'N/A', sale.customer || 'N/A', (sale.items || []).map(i => i.name || '').join(', '), `${sale.total || 0}`, sale.soldBy || 'N/A']);
+            doc.autoTable({ startY: 25, head: [['Date', 'Invoice', 'Customer', 'Items', 'Total', 'Sold By']], body: tableData });
             doc.save('report.pdf');
         }
 
-        // User Management
         async function loadUsers() {
             const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
-            
             snapshot.forEach(doc => {
                 const u = doc.data();
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${u.name || 'N/A'}</td>
-                    <td>${u.email || 'N/A'}</td>
-                    <td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-info'}">${u.role || 'user'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-1" onclick="openEditUser('${doc.id}', '${u.name || ''}', '${u.email || ''}', '${u.role || 'user'}')">
-                            <i class="fa-solid fa-pen"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name || ''}')">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                `;
+                tr.innerHTML = `<td>${u.name || 'N/A'}</td><td>${u.email || 'N/A'}</td><td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-info'}">${u.role || 'user'}</span></td><td><button class="btn btn-sm btn-warning me-1" onclick="openEditUser('${doc.id}', '${u.name || ''}', '${u.email || ''}', '${u.role || 'user'}')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}', '${u.name || ''}')"><i class="fa-solid fa-trash"></i></button></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -2136,22 +1562,15 @@
             const email = document.getElementById('newUserEmail').value;
             const password = document.getElementById('newUserPassword').value;
             const role = document.getElementById('newUserRole').value;
-
             try {
                 document.getElementById('loadingSpinner').style.display = 'block';
                 const cred = await auth.createUserWithEmailAndPassword(email, password);
-                await db.collection('users').doc(cred.user.uid).set({
-                    name, email, role,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                await db.collection('users').doc(cred.user.uid).set({ name, email, role, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
                 await auth.signOut();
                 document.getElementById('loadingSpinner').style.display = 'none';
                 alert('ইউজার তৈরি হয়েছে! আবার লগইন করুন।');
                 location.reload();
-            } catch (error) {
-                document.getElementById('loadingSpinner').style.display = 'none';
-                alert('ত্রুটি: ' + error.message);
-            }
+            } catch (error) { document.getElementById('loadingSpinner').style.display = 'none'; alert('ত্রুটি: ' + error.message); }
         });
 
         function openEditUser(uid, name, email, role) {
@@ -2167,34 +1586,24 @@
             const uid = document.getElementById('editUserUid').value;
             const name = document.getElementById('editUserName').value;
             const role = document.getElementById('editUserRole').value;
-
             try {
                 await db.collection('users').doc(uid).update({ name, role });
                 bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
                 alert('আপডেট হয়েছে!');
                 loadUsers();
-            } catch (error) {
-                alert('ত্রুটি: ' + error.message);
-            }
+            } catch (error) { alert('ত্রুটি: ' + error.message); }
         });
 
         async function deleteUser(uid, name) {
             if (confirm(`"${name}" কে ডিলিট করবেন?`)) {
-                try {
-                    await db.collection('users').doc(uid).delete();
-                    alert('ডিলিট হয়েছে!');
-                    loadUsers();
-                } catch (error) {
-                    alert('ত্রুটি: ' + error.message);
-                }
+                try { await db.collection('users').doc(uid).delete(); alert('ডিলিট হয়েছে!'); loadUsers(); }
+                catch (error) { alert('ত্রুটি: ' + error.message); }
             }
         }
 
-        // Product CRUD
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = JSON.parse(localStorage.getItem('user'));
-            
             await db.collection('products').add({
                 sku: document.getElementById('pSku').value,
                 serial: document.getElementById('pSerial').value,
@@ -2207,7 +1616,6 @@
                 addedBy: user.name || 'Unknown',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            
             bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
             e.target.reset();
             await loadProducts();
@@ -2217,17 +1625,11 @@
         async function editProduct(id) {
             const product = products.find(p => p.id === id);
             if (!product) return;
-            
             const newName = prompt('নাম:', product.name);
             const newPrice = prompt('বিক্রয় মূল্য:', product.salePrice);
             const newQty = prompt('স্টক:', product.qty);
-            
             if (newName && newPrice && newQty) {
-                await db.collection('products').doc(id).update({
-                    name: newName,
-                    salePrice: Number(newPrice) || 0,
-                    qty: Number(newQty) || 0
-                });
+                await db.collection('products').doc(id).update({ name: newName, salePrice: Number(newPrice) || 0, qty: Number(newQty) || 0 });
                 await loadProducts();
                 setTimeout(() => updateCharts(), 500);
             }
@@ -2241,31 +1643,16 @@
             }
         }
 
-        // Barcode Scanner
         function openBarcodeScanner() {
             new bootstrap.Modal(document.getElementById('barcodeModal')).show();
-            
             setTimeout(() => {
                 html5QrCode = new Html5Qrcode("reader");
-                html5QrCode.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    onScanSuccess,
-                    onScanFailure
-                ).catch(err => {
-                    console.log("Camera error:", err);
-                });
+                html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess, onScanFailure).catch(err => { console.log("Camera error:", err); });
             }, 500);
         }
 
         function stopBarcodeScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                }).catch(err => {
-                    console.log("Stop error:", err);
-                });
-            }
+            if (html5QrCode) { html5QrCode.stop().then(() => { html5QrCode.clear(); }).catch(err => { console.log("Stop error:", err); }); }
         }
 
         function onScanSuccess(decodedText, decodedResult) {
@@ -2275,43 +1662,24 @@
             bootstrap.Modal.getInstance(document.getElementById('barcodeModal')).hide();
         }
 
-        function onScanFailure(error) {
-            // console.warn(`Code scan error = ${error}`);
-        }
+        function onScanFailure(error) { }
 
         function searchByBarcode() {
             const barcode = document.getElementById('manualBarcode').value.trim();
-            if (!barcode) {
-                alert('বারকোড নম্বর দিন');
-                return;
-            }
-            
+            if (!barcode) { alert('বারকোড নম্বর দিন'); return; }
             const product = products.find(p => p.barcode === barcode);
-            if (product) {
-                addToCart(product.id);
-                alert(`প্রোডাক্ট যোগ হয়েছে: ${product.name}`);
-            } else {
-                alert('এই বারকোডের প্রোডাক্ট পাওয়া যায়নি!');
-            }
+            if (product) { addToCart(product.id); alert(`প্রোডাক্ট যোগ হয়েছে: ${product.name}`); }
+            else { alert('এই বারকোডের প্রোডাক্ট পাওয়া যায়নি!'); }
         }
 
-        // Backup/Restore
         async function backupData() {
-            const data = {
-                products: products,
-                sales: sales,
-                customers: customers,
-                exportDate: new Date().toISOString()
-            };
-            
+            const data = { products: products, sales: sales, customers: customers, exportDate: new Date().toISOString() };
             const dataStr = JSON.stringify(data, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            
             const link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
             link.download = `amin_computer_backup_${new Date().toISOString().split('T')[0]}.json`;
             link.click();
-            
             alert('ব্যাকআপ সফলভাবে ডাউনলোড হয়েছে!');
         }
 
@@ -2319,37 +1687,24 @@
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json';
-            
             input.onchange = async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                
                 const reader = new FileReader();
                 reader.onload = async (event) => {
                     try {
                         const data = JSON.parse(event.target.result);
-                        
                         if (confirm('এটি বর্তমান ডাটা মুছে নতুন ডাটা লোড করবে। আপনি কি নিশ্চিত?')) {
-                            for (const product of data.products) {
-                                await db.collection('products').add(product);
-                            }
-                            for (const sale of data.sales) {
-                                await db.collection('sales').add(sale);
-                            }
-                            for (const customer of data.customers) {
-                                await db.collection('customers').doc(customer.phone).set(customer);
-                            }
-                            
+                            for (const product of data.products) { await db.collection('products').add(product); }
+                            for (const sale of data.sales) { await db.collection('sales').add(sale); }
+                            for (const customer of data.customers) { await db.collection('customers').doc(customer.phone).set(customer); }
                             alert('ডাটা সফলভাবে রিস্টোর হয়েছে!');
                             location.reload();
                         }
-                    } catch (error) {
-                        alert('রিস্টোর করতে সমস্যা: ' + error.message);
-                    }
+                    } catch (error) { alert('রিস্টোর করতে সমস্যা: ' + error.message); }
                 };
                 reader.readAsText(file);
             };
-            
             input.click();
         }
 
@@ -2359,21 +1714,16 @@
             backupBtn.className = 'btn btn-sm btn-light me-2';
             backupBtn.innerHTML = '<i class="fa-solid fa-download me-1"></i>ব্যাকআপ';
             backupBtn.onclick = backupData;
-            
             const restoreBtn = document.createElement('button');
             restoreBtn.className = 'btn btn-sm btn-light me-2';
             restoreBtn.innerHTML = '<i class="fa-solid fa-upload me-1"></i>রিস্টোর';
             restoreBtn.onclick = restoreData;
-            
             navbar.insertBefore(backupBtn, navbar.firstChild);
             navbar.insertBefore(restoreBtn, navbar.firstChild);
         });
 
         document.getElementById('searchProduct').addEventListener('input', renderProducts);
-        auth.onAuthStateChanged(() => {
-            currentUser = JSON.parse(localStorage.getItem('user'));
-            loadApp();
-        });
+        auth.onAuthStateChanged(() => { currentUser = JSON.parse(localStorage.getItem('user')); loadApp(); });
     </script>
 </body>
 </html>
